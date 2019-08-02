@@ -1,4 +1,6 @@
-
+import ast
+import numpy as np
+import time
 
 def butter_highpass(cutoff, fs, order=4):
     nyq = 0.5 * fs
@@ -30,15 +32,15 @@ def r4_normalize(x, d, e=1.5):
     return x*d**e/n
 
 
-def read_settings(f):
+def read_settings(f, encoding=None):
     f.seek(0)
     data = f.readline()
-    data = data.decode(ENCODING) if BINARY else data
+    data = data.decode(encoding) if encoding else data
     settings = ast.literal_eval(data)
     return settings
 
 
-def find_start(f):
+def find_start(f, start, nbytes_sweep):
     done = False
     while not done:
         r = f.read(1)
@@ -53,7 +55,7 @@ def find_start(f):
             current_position = f.tell()
             # Verify that what follows are full sweeps
             for j in range(1):
-                f.read(NBYTES_SWEEP)  # Read a whole sweep
+                f.read(nbytes_sweep)  # Read a whole sweep
                 if f.read(1) != start:
                     done = False
                 next_frame_number = f.read(1)
@@ -66,12 +68,12 @@ def find_start(f):
     return current_frame_number
 
 
-def import_data(f, start, first_frame, nb_channels=1):
+def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, nb_channels=1):
     sweep_count = 0
     signal = start[0]
     counter_sweeps = 0
     counter_skipped_lines = 0
-    skipped_frame_data = np.zeros((NBYTES_SWEEP//4,), dtype=np.int16)
+    skipped_frame_data = np.zeros((nbytes_sweep//4,), dtype=np.int16)
 
     current_frame_number = first_frame
     # The data will be stored in a dict of list, the keys being the channel number
@@ -88,15 +90,15 @@ def import_data(f, start, first_frame, nb_channels=1):
         t0 = time.perf_counter()
         #if f.tell() != 202:
             #break
-        sweep_data = f.read(NBYTES_SWEEP)  # Block read
+        sweep_data = f.read(nbytes_sweep)  # Block read
         t1 = time.perf_counter()
         #print(t1-t0)
-        #j += NBYTES_SWEEP
-        #i += NBYTES_SWEEP
-        if len(sweep_data) != NBYTES_SWEEP:
+        #j += nbytes_sweep
+        #i += nbytes_sweep
+        if len(sweep_data) != nbytes_sweep:
             break  # No more data, we have reached the end of the file
 
-    #if j == NBYTES_SWEEP:
+    #if j == nbytes_sweep:
         signal, next_frame_number = f.read(2) # Should get the next signal and frame_number
         restart = False
         if signal != start[0]:
@@ -113,22 +115,22 @@ def import_data(f, start, first_frame, nb_channels=1):
             pos = f.tell()
 
             # First option: Look at the sweep_data array to see if the previous frame was not "too short"
-            for jj in range(NBYTES_SWEEP-1, 0, -1):
+            for jj in range(nbytes_sweep-1, 0, -1):
                 if sweep_data[jj] == start[0] and sweep_data[jj+1] == (current_frame_number+1)&0xff:
                     print("[WARNING] Found header [{}, {}] at {} in the sweep_data".format(sweep_data[jj], sweep_data[jj+1], jj))
                     # Sanity check:
-                    f.seek(pos - 2 - NBYTES_SWEEP + jj)
+                    f.seek(pos - 2 - nbytes_sweep + jj)
                     signal, next_frame_number = f.read(2)  # Start here and take 1 loss
                     print("[WARNING] Skipping sweep {}".format(counter_sweeps))
                     #print("[WARNING] Position {}: {} | Position {}: {}".format(f.tell()-2, signal, f.tell()-1, next_frame_number))
-                    #f.seek(pos - 2 - NBYTES_SWEEP + jj)
+                    #f.seek(pos - 2 - nbytes_sweep + jj)
                     break
 
             #current_frame_number = find_start(f) # Should be right on a start byte if found in sweep_data
             current_frame_number = next_frame_number
             print('[WARNING] Jumped to {}, moved by {} byte'.format(f.tell(), f.tell()-pos))
             if f.tell()-pos > 0:
-                # Somehow the previous frame was NBYTES_SWEEP and did not contain an issue
+                # Somehow the previous frame was nbytes_sweep and did not contain an issue
                 raise ValueError("[ERROR] Why was a correct header not found in the previous data?")
             #continue
         else:
@@ -138,7 +140,7 @@ def import_data(f, start, first_frame, nb_channels=1):
             # Convert to 2's complement grabbing byte 2 at a time
             t0 = time.perf_counter()
             #signed_data = [twos_comp(sweep_data[2 * ii] + (sweep_data[2 * ii + 1] << 8), 16) for ii in
-                           #range(int(NBYTES_SWEEP / 2))]
+                           #range(int(nbytes_sweep / 2))]
 
             signed_data = np.frombuffer(sweep_data, dtype=np.int16)  # Does everything at once
             #signed_data_2 = np.invert(signed_data_2)
@@ -147,7 +149,7 @@ def import_data(f, start, first_frame, nb_channels=1):
             #print(signed_data)
             t1 = time.perf_counter()
             #print(t1-t0)
-            if channels == 2:  # Data is entangled: 2 byte for ch1 then 2 byte for ch2
+            if nb_channels == 2:  # Data is entangled: 2 byte for ch1 then 2 byte for ch2
                 if restart: # There is no data
                     data[1].append(skipped_frame_data)
                     data[2].append(skipped_frame_data)

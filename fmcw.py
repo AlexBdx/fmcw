@@ -1,5 +1,6 @@
 import pylibftdi as ftdi
-from adf4158 import ADF4158
+#from adf4158 import ADF4158
+#import adf4158
 #from Queue import Queue, Empty
 from queue import Queue, Empty
 from threading import Thread
@@ -10,10 +11,10 @@ import datetime
 #print(ftdi.__file__)
 
 class FMCW3():
-    def __init__(self):
+    def __init__(self, ADC, encoding='latin1'):
         SYNCFF = 0x40
         SIO_RTS_CTS_HS = (0x1 << 8)
-        self.device = ftdi.Device(mode='t', interface_select=ftdi.INTERFACE_A, encoding=ENCODING)
+        self.device = ftdi.Device(mode='t', interface_select=ftdi.INTERFACE_A, encoding=encoding)
         #self.device.open()  # Not needed if not lazy open
         self.device.ftdi_fn.ftdi_set_bitmode(0xff, SYNCFF)
         self.device.ftdi_fn.ftdi_read_data_set_chunksize(0x10000)
@@ -21,7 +22,7 @@ class FMCW3():
         self.device.ftdi_fn.ftdi_setflowctrl(SIO_RTS_CTS_HS)
         self.device.flush()
 
-        self.pll = ADF4158()
+        self.pll = ADC
         self.fclk = 40e6
         self.fpd_freq = self.fclk/2
 
@@ -154,12 +155,13 @@ class FMCW3():
     def clear_buffer(self):
         return self.send_packet(0, 11)
 
+
 class Writer(Thread):
-    def __init__(self, filename, queue):
+    def __init__(self, filename, queue, encoding='latin1'):
         Thread.__init__(self)
         
         self.queue = queue
-        self.f = open(filename, 'w', encoding=ENCODING)
+        self.f = open(filename, 'w', encoding=encoding)
         print("[INFO] Opened {} for writing".format(filename))
 
     def run(self):
