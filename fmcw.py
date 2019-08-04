@@ -157,23 +157,23 @@ class FMCW3():
 
 
 class Writer(Thread):
-    def __init__(self, filename, queue, encoding='latin1'):
+    def __init__(self, filename, queue, encoding='latin1', timeout=0.5):
         Thread.__init__(self)
         
         self.queue = queue
         self.f = open(filename, 'w', encoding=encoding)
+        self.timeout = timeout
         print("[INFO] Opened {} for writing".format(filename))
 
     def run(self):
         wrote = 0
         freq = 1
         time_tracker = 0
-        timeout = 0.5
         while True:
             try:
-                d = self.queue.get(True, timeout)
+                d = self.queue.get(True, self.timeout)
             except Empty:
-                print('[ERROR] Timeout after {} s without data | Wrote {} byte'.format(timeout, wrote))
+                print('[ERROR] Timeout after {} s without data | Wrote {} byte'.format(self.timeout, wrote))
                 self.f.close()
                 return
             if len(d) == 0:
@@ -185,4 +185,4 @@ class Writer(Thread):
                 #self.f.write("\n")
                 
                 wrote += len(d)
-                print("[INFO] Written {:,} byte to file".format(wrote))
+                #print("[INFO] Written {:,} byte to file".format(wrote))
