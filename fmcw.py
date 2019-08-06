@@ -141,9 +141,17 @@ class FMCW3():
         return self.send_packet(w, 8)
 
     def write_decimate(self, decimate):
+        """[Old Henrik] Used to be 1 based
         if decimate > 2**16-1 or decimate < 1:
             raise ValueError("Invalid decimate value")
         decimate = int(decimate) - 1
+        """
+        # Sanity checks
+        if type(decimate) != int:
+            raise TypeError('decimate needs to be an int')
+        if decimate > 2**16-1 or decimate < 0:
+            raise ValueError("Invalid decimate value: {} is not between {} and {}".format(decimate, 0, 2**16-1))
+        
         w = [decimate & 0xff, (decimate >> 8) & 0xff]
         return self.send_packet(w, 9)
 

@@ -2,6 +2,8 @@ import ast
 import numpy as np
 import time
 import collections
+import copy
+from scipy.signal import butter, filtfilt
 
 def butter_highpass(cutoff, fs, order=4):
     nyq = 0.5 * fs
@@ -70,13 +72,14 @@ def find_start(f, start, nbytes_sweep):
     return current_frame_number
 
 
-def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, nb_channels=1):
+def import_data(f, start, first_frame, nbytes_sweep, samples, sweeps_to_drop, nb_channels=1, verbose=False):
     #print("START", start)
     sweep_count = 0
+    #sweep_count_2 = 0
     signal = start[0]
     counter_sweeps = 0
-    counter_skipped_lines = 0
-    skipped_frame_data = np.zeros((nbytes_sweep//4,), dtype=np.int16)
+    #counter_sweeps_2 = 0
+    #skipped_frame_data = np.zeros((nbytes_sweep//4,), dtype=np.int16)
 
     current_frame_number = first_frame
     # The data will be stored in a dict of lists, the keys being the channel number
@@ -85,11 +88,13 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, n
     for k in range(nb_channels):
         data[k+1] = []
         #data_2[k + 1] = []
-    data['skipped_frames'] = []  # Stores the skipped frames for both channels
+    data['skipped_sweeps'] = []  # Stores the skipped frames for both channels
+    #data_2['skipped_sweeps'] = []  # Stores the skipped frames for both channels
 
     while samples == None or i < samples:
         # Read the start signal and the the frame_number
-        print("\n[INFO] Current header [{}, {}] | sweep_data starting at: {}".format(signal, current_frame_number, f.tell()))
+        if verbose:
+            print("\n[INFO] Current header [{}, {}] | sweep_data starting at: {}".format(signal, current_frame_number, f.tell()))
         t0 = time.perf_counter()
         sweep_data = f.read(nbytes_sweep)  # Block read
         t1 = time.perf_counter()
@@ -100,13 +105,15 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, n
         signal, next_frame_number = f.read(2) # Should get the next signal and frame_number
         restart = False
         if signal != start[0]:
-            print('[WARNING] Lost track of start at {} | Next header read: [{}, {}] | Expected header: [{}, {}]'
+            if verbose:
+                print('[WARNING] Lost track of start at {} | Next header read: [{}, {}] but expected: [{}, {}]'
                   .format(f.tell(), signal, next_frame_number, start[0], (current_frame_number+1)&0xff))
             restart = True
         if restart == False and current_frame_number != None:
             if next_frame_number != (current_frame_number+1)&0xff:
-                print('[WARNING] Lost a sweep. Previous {}, now {} at {}'.format(current_frame_number, next_frame_number, f.tell()))
-                assert 1==0
+                if verbose:
+                    print('[WARNING] Lost a sweep at {} | Next header read: [{}, {}] but expected: [{}, {}]'.format(f.tell(), signal, next_frame_number, start[0], (current_frame_number+1)&0xff))
+                #assert 1==0
                 restart = True
 
         if restart: # Find the nearest start flag, looking at the latest data first
@@ -121,12 +128,14 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, n
                     flag_success = True
                 
                 if flag_success:
-                    print("[WARNING] Found header [{}, {}] at position {} in the sweep_data of length {}".format(sweep_data[jj], sweep_data[jj+1], jj, nbytes_sweep))
+                    if verbose:
+                        print("[WARNING] Found next header [{}, {}] at position {} in the sweep_data of length {}".format(sweep_data[jj], sweep_data[jj+1], jj, nbytes_sweep))
                     # Sanity check:
                     f.seek(pos - 2 - nbytes_sweep + jj)
                     signal, next_frame_number = f.read(2)  # Drop previous sweep
-                    print('[WARNING] Jumped to {}, moved by {} byte'.format(f.tell(), f.tell()-pos))
-                    print("[WARNING] Skipping sweep {}. New header: [{}, {}] (overall sweep count: {})".format(current_frame_number, signal, next_frame_number, counter_sweeps))
+                    if verbose:
+                        print('[WARNING] Jumped to {}, moved by {} byte'.format(f.tell(), f.tell()-pos))
+                        print("[WARNING] Skipping sweep {}. New header: [{}, {}] (overall sweep count: {})".format(current_frame_number, signal, next_frame_number, counter_sweeps))
                     # Process the new location
                     current_frame_number = next_frame_number
                     
@@ -138,57 +147,59 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, decimate_sweeps, n
         else:
             current_frame_number = next_frame_number
 
-        if decimate_sweeps <= 1 or sweep_count >= decimate_sweeps:
-            # Convert to 2's complement grabbing byte 2 at a time
+
+        if sweep_count == sweeps_to_drop:
+            if verbose:
+                print("[INFO] Using this sweep : {}/{}".format(sweep_count, sweeps_to_drop))
             t0 = time.perf_counter()
-            #signed_data = [twos_comp(sweep_data[2 * ii] + (sweep_data[2 * ii + 1] << 8), 16) for ii in
-                           #range(int(nbytes_sweep / 2))]
-
             signed_data = np.frombuffer(sweep_data, dtype=np.int16)  # Does everything at once
-            #signed_data_2 = np.invert(signed_data_2)
-            #assert np.array_equal(signed_data, signed_data_2)
-
-            #print(signed_data)
             t1 = time.perf_counter()
-            #print(t1-t0)
-            if nb_channels == 2:  # Data is entangled: 2 byte for ch1 then 2 byte for ch2
-                if restart: # There is no data
+            
+            if restart:
+                if verbose:
                     print("[WARNING] Due to restart, appending zeros for sweep {} (overall sweep counter: {})".format(current_frame_number-1, counter_sweeps))
-                    data[1].append(skipped_frame_data)
-                    data[2].append(skipped_frame_data)
-                    data['skipped_frames'].append(counter_sweeps)
-                    #data_2[1].append(skipped_frame_data)
-                    #data_2[2].append(skipped_frame_data)
-                    counter_skipped_lines += 1
-                else:
-                    #print("[INFO] max: {}, min: {}".format(np.max(signed_data[::2]), np.min(signed_data[::2])))
-                    data[1].append(signed_data[::2])
-                    data[2].append(signed_data[1::2])
-                    #data_2[1].append(signed_data_2[::2])
-                    #data_2[2].append(signed_data_2[1::2])
-                    #assert 1==0
-                counter_sweeps += 1
-
-            else:
-                if restart:
-                    data[1].append(skipped_frame_data)
-                    counter_skipped_lines += 1
-                else:
-                    data[1].append(signed_data)
-                counter_sweeps += 1
+                signed_data = np.zeros((nbytes_sweep//2,), dtype=np.int16)
+                data['skipped_sweeps'].append(counter_sweeps)
+            # Append channel data to respective list
+            for channel in range(nb_channels): # Channels number are 1 based for now
+                data[channel+1].append(signed_data[channel::nb_channels])
+            #print(data[1][0][:10])
+            #print(data[2][0][:10])
+            #assert not np.array_equal(data[1], data[2])
+            counter_sweeps += 1
             sweep_count = 0
-        else:
+        else: # Decimate sweep: should we interpolate the data or drop zeros?
+            if verbose:
+                print("[INFO] Decimating sweep : {}/{}".format(sweep_count, sweeps_to_drop))
             sweep_count += 1
-    return data, counter_skipped_lines
+    
+    # Return numpy arrays rather than lists
+    for k in range(nb_channels):
+        data[k+1] = np.array(data[k+1], dtype=np.int16)
+    return data
+
+
+def compare_ndarrays(a, b):
+    print("Type: {} | {}".format(type(a), type(b)))
+    if type(a) != type(b):
+        raise TypeError("Arrays are not of the same type")
+    
+    print("Shape: {} | {}".format(a.shape, b.shape))
+    if a.shape != b.shape:
+        raise TypeError("Arrays do not have the same shape")
+    
+    print("Data type: {} | {}".format(a.dtype, b.dtype))
+    if a.dtype != b.dtype:
+        raise TypeError("Array elements do not have the same type")
 
 
 def subtract_background(channel_data, w, data):
     zero_sweep = np.zeros((channel_data.shape[1],), dtype=np.int16)
     # Subtract background from the channels data, which are numpy arrays
     # Input is the data dictionnary, output is the list of processed data
-    background = np.sum(channel_data, axis=0)/(channel_data.shape[0]-len(data['skipped_frames']))
+    background = np.sum(channel_data, axis=0)/(channel_data.shape[0]-len(data['skipped_sweeps']))
     channel_data = w*(channel_data - background)
-    for skipped_frame in data['skipped_frames']:
+    for skipped_frame in data['skipped_sweeps']:
         channel_data[skipped_frame] = zero_sweep
     return channel_data
 
@@ -199,7 +210,7 @@ def subtract_clutter(channel_data, w, data, clutter_averaging=1):
     a = np.zeros((clutter_averaging, channel_data.shape[1]))  # Padding for the first clutter_averaging sweeps
     print(a.shape, channel_data.shape)
 
-    print(sorted(data['skipped_frames']))
+    print(sorted(data['skipped_sweeps']))
 
     # Build the indexes to use for the clutter subtraction
     last_good_indexes = collections.deque(maxlen=clutter_averaging)  # Deque stored the last meaningful sweeps
@@ -207,7 +218,7 @@ def subtract_clutter(channel_data, w, data, clutter_averaging=1):
     subtract_channel_data = []
     #subtract_ch2 = []
     for sweep_number in range(len(channel_data)):
-        if sweep_number in sorted(data['skipped_frames']):
+        if sweep_number in sorted(data['skipped_sweeps']):
             subtract_channel_data.append(zero_sweep)
             #subtract_ch2.append(zero_sweep)
         else:
