@@ -21,6 +21,7 @@ class FMCW3():
         self.device.ftdi_fn.ftdi_write_data_set_chunksize(0x10000)
         self.device.ftdi_fn.ftdi_setflowctrl(SIO_RTS_CTS_HS)
         self.device.flush()
+        print("[INFO] FTDI baudrate:", self.device.baudrate)
 
         self.pll = ADC
         self.fclk = 40e6

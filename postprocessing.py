@@ -59,137 +59,201 @@ def read_settings(f, encoding=None):
     settings = ast.literal_eval(data)
     return settings
 
-def process_batch(rest, data, start, nbytes_sweep, nb_channels, next_header, counter_sweeps, sweeps_to_drop, verbose=False):
+def find_start_batch(data, s, initial_index=0):
+    flag_valid_header = False
+    for index in range(initial_index, len(data) - s['NBYTES_SWEEP'] - 2):  # index starts at 0
+        next_header = [data[index], data[index + 1]]
+        if next_header[0] == s['start'] and data[index + s['NBYTES_SWEEP'] + 2] == s[
+            'start']:  # Not 100% foolproof, but cannot be anyway
+            print("[INFO] Found start signal {} at position {} (jumped {} byte)."
+                  .format(next_header, index, index-initial_index))
+            print("[INFO] Next header would read [{}, {}]".format(data[index + s['NBYTES_SWEEP'] + 2],
+                                                                  data[index + s['NBYTES_SWEEP'] + 3]))
+            flag_valid_header = True
+            break
+    if flag_valid_header:  # All good
+        index += 2  # Skip the header, it is saved in next_header
+    else:
+        index = -1  # No valid header was found
+        next_header = []
+        print("[WARNING] No valid header found when searching for a start signal")
+        #print("[ERROR] index: {} | len(data): {} | s['NBYTES_SWEEP']: {}".format(index, len(data), s['NBYTES_SWEEP']))
+        #raise ValueError('[ERROR] No valid header found in the data!')
+
+    return index, next_header
+
+def process_batch(rest, data, s, next_header, sweep_count, global_sweep_counter, verbose=False):
     # rest is a np.int8 array
     # data is a str
     # start is a binary str
-    # nbytes_sweep is an int
-    # counter_sweeps is an int64
+    # s['NBYTES_SWEEP'] is an int
+    # global_sweep_counter is an int64
     # Sanity checks
     assert type(rest)==bytes or rest == None
     assert type(data)==bytes
-    assert type(start)==bytes
-    assert type(nbytes_sweep)==int
-    assert type(next_header)==tuple or next_header==None
+    assert type(s['start'])==int
+    assert type(s['NBYTES_SWEEP'])==int
+    assert type(next_header)==list
     # 0. Create temp variables
-    sweep_count = 0  # For software decimation
-    skipped_data = np.zeros((nbytes_sweep // 2,), dtype=np.int16)
-    ch = dict()
-    # data_2 = dict()
-    for k in range(nb_channels):
-        ch[k + 1] = []
+    #sweep_count = 0  # For software decimation
+    sweeps_scanned = 0
+    skipped_data = np.zeros((s['NBYTES_SWEEP'] // 2,), dtype=np.int16)  # Create the 0 array only once
+    batch_ch = dict()
+    for k in range(s['channel_count']):
+        batch_ch[k + 1] = []
         # data_2[k + 1] = []
-    ch['skipped_sweeps'] = []  # Stores the skipped frames for both channels
+    batch_ch['skipped_sweeps'] = []  # Stores the skipped frames for both channels
 
     # 1. Concatenate the rest with the data
     initial_data_length = len(data)  # DEBUG
     if rest != None:
         data = rest + data  # Concatenate the bytearrays
 
-    print("[INFO] rest length: {} | block: {} long | shape to process: {}".format(len(rest), initial_data_length, len(data)))
+    if verbose:
+        print("[INFO] rest length: {} | block: {} long | shape to process: {}".format(len(rest), initial_data_length, len(data)))
     assert type(data) == bytes
 
     # 2. Find the start
-    flag_valid_header = False
-    if next_header==None:  # First USB frame we sample
-        for index in range(len(data)-nbytes_sweep-2):  # index starts at 0
-            next_header = data[index], data[index + 1]
-            if next_header[0] == start[0] and data[index+nbytes_sweep+2] == start[0]:  # Not 100% foolproof, but cannot be
-                print("[INFO] Found start signal {} at position {}.".format(next_header, index))
-                print("[INFO] Next header would read ({}, {})".format(data[index+nbytes_sweep+2], data[index+nbytes_sweep+3]))
-                flag_valid_header = True
-                break
-        if not flag_valid_header:
-            print("[ERROR] index: {} | len(data): {} | nbytes_sweep: {}".format(index, len(data), nbytes_sweep))
-            raise ValueError('[ERROR] No valid header found in the data!')
-    else:
+    if next_header[0] == 0:  # Either no previous data or the previous frame did not end w/ valid header
+        if next_header[1]:  # The previous batch ended without a valid next header
+            current_frame_number = next_header[1]
+            index, next_header = find_start_batch(data, s)
+            sweeps_scanned = (next_header[1] - current_frame_number)&0xff
+
+            for _ in range(sweeps_scanned):  # Add all the required zeros before getting started
+                if sweep_count == s['sweeps_to_drop']:
+                    signed_data = skipped_data  # Will append just 0s. Frame is skipped
+                    batch_ch['skipped_sweeps'].append(global_sweep_counter)
+
+                    for channel in range(s['channel_count']):  # Channels number are 1 based for now
+                        batch_ch[channel + 1].append(signed_data[channel::s['channel_count']])  # Data is entangled
+
+                    # Increment counters
+                    sweep_count = 0
+                    global_sweep_counter += 1  # Only count sweeps after decimation
+                else:  # Decimate sweep: should we interpolate the data or drop zeros?
+                    if verbose:
+                        print("[INFO] Decimating sweep : {}/{}".format(sweep_count, s['sweeps_to_drop']))
+                    sweep_count += 1
+            sweeps_scanned = 0
+
+        else:
+            index, next_header = find_start_batch(data, s)
+            assert len(next_header)  # If false, means that no valid start found in the whole batch!
+    else:  # There is a valid previous header.
+        index = 0  # rest+data will be scanned from the start
         if verbose:
             print("[INFO] Starting with header", next_header)
 
-    current_frame_number = next_header[1]
-    index += 2  # Skip the header, it is saved in next_header
+    try:  # [DEBUG] I saw that fail once, not sure why
+        current_frame_number = next_header[1]
+    except:
+        print(next_header)
+
 
     assert type(data) == bytes
     assert type(next_header[0]==np.int8)
     # 3. Process the batches
-    while index+nbytes_sweep+2 < len(data):  # As long as we can scoop the next batch and header
-        # 3.1 Scoop the next nbytes_sweep and the following header
+    while index+s['NBYTES_SWEEP']+2 < len(data):  # As long as we can scoop the next batch and header
+        # 3.1 Scoop the next s['NBYTES_SWEEP'] and the following header
         if verbose:
             print("\n[INFO] Reading sweep", current_frame_number)
-        batch = data[index:index+nbytes_sweep]
-        next_header = data[index+nbytes_sweep], data[index+nbytes_sweep+1]
+        batch = data[index:index+s['NBYTES_SWEEP']]
+        next_header = [data[index+s['NBYTES_SWEEP']], data[index+s['NBYTES_SWEEP']+1]]
 
-        # 3.2 Based on next_header, process the sweep data accordingly
-        if next_header[0] == start[0] and next_header[1] == (current_frame_number+1)&0xff:
+        # 3.2 First case: the header is valid
+        if next_header[0] == s['start'] and next_header[1] == (current_frame_number+1)&0xff:
             if verbose:
                 print("[INFO] Successfully read sweep {} starting at index {}".format(current_frame_number, index))
             flag_success = True
-            index += nbytes_sweep + 2
+            index += s['NBYTES_SWEEP'] + 2
+            sweeps_scanned = (next_header[1] - current_frame_number) & 0xff
+            assert sweeps_scanned == 1  # Debug
 
+        # Second case: the next_header does not match expectations
         else:  # Drop this sweep as next_header does not match expectations
             if verbose:
                 print('[WARNING] Lost track of sweep starting at {} '.format(index))
                 print('[WARNING] Next header at {} read: {} | Expected: ({}, {})'
-                      .format(index+nbytes_sweep, next_header, start[0], (current_frame_number+1)&0xff))
+                      .format(index+s['NBYTES_SWEEP'], next_header, s['start'], (current_frame_number+1)&0xff))
             flag_success = False
 
-            # Look for the start of the correct next_header in the dropped data
-
-            for jj in range(nbytes_sweep)[::-1]:  # Go in reverse
-                if jj == nbytes_sweep - 1:
-                    # if sweep_data[jj] == start[0] and next_frame_number == (current_frame_number+1)&0xff:  # I think this is wrong
-                    if batch[jj] == start[0] and next_header[0] == (current_frame_number + 1) & 0xff:  # Check this
-                        next_header = (batch[jj], next_header[0])
+            # Option 1: Look for the start of the correct next_header in the dropped data
+            for jj in range(s['NBYTES_SWEEP'])[::-1]:  # Go in reverse
+                if jj == s['NBYTES_SWEEP'] - 1:
+                    # if sweep_data[jj] == s['start'] and next_frame_number == (current_frame_number+1)&0xff:  # I think this is wrong
+                    if batch[jj] == s['start'] and next_header[0] == (current_frame_number + 1) & 0xff:  # Check this
+                        next_header = [batch[jj], next_header[0]]
                         # raise
                         break
                     else:
                         next_header = []
-                elif batch[jj] == start[0] and batch[jj + 1] == (current_frame_number + 1) & 0xff:
-                    next_header = (batch[jj], batch[jj+1])
+                elif batch[jj] == s['start'] and batch[jj + 1] == (current_frame_number + 1) & 0xff:
+                    next_header = [batch[jj], batch[jj+1]]
                     break
             # Restart from that location
             if len(next_header):
                 if verbose:
                     print("[WARNING] Found header {} at {}".format(next_header, index+jj))
-                    print("[WARNING] Skipping sweep {} from {} to {}.".format(current_frame_number, index, index+nbytes_sweep))
+                    print("[WARNING] Skipping sweep {} from {} to {}.".format(current_frame_number, index, index+s['NBYTES_SWEEP']))
                     print("[WARNING] Restarting with sweep {} from position {}".format(next_header[1], index+jj+2))
-                index += jj + 2 # Skip the next_header and get ready to scoop nbytes_sweep of data
+                index += jj + 2 # Skip the next_header and get ready to scoop s['NBYTES_SWEEP'] of data
+                sweeps_scanned = (next_header[1] - current_frame_number) & 0xff
+                assert sweeps_scanned == 1  # Debug
             else:
+                # Option 2: Search for the header forward
                 print("[WARNING] Dropping sweep as the next header was not found in previous data.")
-                raise ValueError('[ERROR] Next header not found in previous incorrect frame. Where is it?')
+                index, next_header = find_start_batch(data, s, initial_index=index)
+                print("[WARNING] Current sweep number: {} | Next header count: {}"
+                      .format(current_frame_number, next_header[1]))
+                if index == -1:
+                    # Failed to find a valid header
+                    index = len(data) - 1  # No rest will be generated
+                    next_header = [0, current_frame_number]  # Communicate
+                    sweeps_scanned = 0  # Skip channel assignement
+                    print('[ERROR] Next header not found in previous incorrect frame nor rest of frame.')
+                else:
+                    sweeps_scanned = (next_header[1] - current_frame_number) & 0xff  # Could be > 1
+
+         # 1 for the backward pass, >= 1 for fwd
         current_frame_number = next_header[1]  # Ready to read the next sweep
 
         # 3.3 Append data if we are not decimating
-        if sweep_count == sweeps_to_drop:
-            if flag_success:
-                signed_data = np.frombuffer(batch, dtype=np.int16)  # Read as int16
-            else:
-                signed_data = skipped_data # Will append just 0s. Frame is skipped
-                ch['skipped_sweeps'].append(counter_sweeps)
+        #if sweep_count == s['sweeps_to_drop']:
+        for _ in range(sweeps_scanned):
+            if sweep_count == s['sweeps_to_drop']:
+                if flag_success:
+                    signed_data = np.frombuffer(batch, dtype=np.int16)  # Read as int16
+                else:
+                    signed_data = skipped_data # Will append just 0s. Frame is skipped
+                    batch_ch['skipped_sweeps'].append(global_sweep_counter)
+    
+                for channel in range(s['channel_count']):  # Channels number are 1 based for now
+                    batch_ch[channel + 1].append(signed_data[channel::s['channel_count']])  # Data is entangled
+    
+                # Increment counters
+                sweep_count = 0
+                global_sweep_counter += 1  # Only count sweeps after decimation
+            else: # Decimate sweep: should we interpolate the data or drop zeros?
+                if verbose:
+                    print("[INFO] Decimating sweep : {}/{}".format(sweep_count, s['sweeps_to_drop']))
+                sweep_count += 1
+        sweeps_scanned = 0
 
-            for channel in range(nb_channels):  # Channels number are 1 based for now
-                ch[channel + 1].append(signed_data[channel::nb_channels])  # Data is entangled
-
-            # Increment counters
-            sweep_count = 0
-            counter_sweeps += 1
-        else: # Decimate sweep: should we interpolate the data or drop zeros?
-            if verbose:
-                print("[INFO] Decimating sweep : {}/{}".format(sweep_count, sweeps_to_drop))
-            sweep_count += 1
 
     # 4. Finalization
     # Return numpy arrays rather than lists
-    for k in range(nb_channels):
-        ch[k + 1] = np.array(ch[k + 1], dtype=np.int16)
+    for k in range(s['channel_count']):
+        batch_ch[k + 1] = np.array(batch_ch[k + 1], dtype=np.int16)
     rest = data[index:]  # Get the rest
     if verbose:
         print("\n[INFO] There is a rest of length", len(rest))
     
-    return ch, next_header, rest, counter_sweeps
+    return batch_ch, next_header, rest, global_sweep_counter, sweep_count
 
 
 def calculate_if_data(channel_data, s):
+    assert type(channel_data) == dict
     if_data = {}
     clim = s['MAX_DIFFERENTIAL_VOLTAGE']
     for channel in channel_data: # Go through all available channels
@@ -199,7 +263,12 @@ def calculate_if_data(channel_data, s):
     return if_data, clim  # dict
 
 
-def calculate_angle_plot(sweeps, s, d, clim, angle_mask):
+def calculate_angle_plot(sweeps, s, clim, tfd_angles):
+    # WARNING: ONLY 2 CHANNELS SUPPORTED SO FAR
+    assert type(sweeps) == dict
+    d = tfd_angles[2]
+    angle_mask = tfd_angles[4]
+
     fxm = None  # If not None need to see sth else
     if fxm:
         coefs = [0.008161818583356717,
@@ -211,8 +280,8 @@ def calculate_angle_plot(sweeps, s, d, clim, angle_mask):
         coefs = [1]
     angle_window = np.kaiser(s['angle_pad'], 150)
 
-    a = np.fft.rfft(sweeps[0])
-    b = np.fft.rfft(sweeps[1])
+    a = np.fft.rfft(sweeps[1])  # Channels indexes are 1 based
+    b = np.fft.rfft(sweeps[2])
     # b *= np.exp(-1j*2*np.pi*channel_dl/(s['c']/(s['f0']+s['bw']/2)))
     b *= np.exp(-1j * 2 * np.pi * s['channel_offset'] * np.pi / 180)
 
@@ -249,16 +318,32 @@ def calculate_angle_plot(sweeps, s, d, clim, angle_mask):
 
 
 def calculate_range_time(ch, s, single_sweep=-1):
-    if single_sweep != -1:
-        sweeps = ch[2][single_sweep]  # Using last sweep only
+    # WARNING: ONLY USING CHANNEL 2 FOR THAT
+    # TO DO: TAKE THE AVERAGE OF ALL CHANNELS
+    # Take the average of all channels
+    sweeps = np.zeros(ch[s['active_channels'][0]].shape)  # There is at least one active channel
+    for channel in s['active_channels']:
+        sweeps += ch[channel].astype(np.int64)
+    sweeps /=  s['channel_count']  # Becomes a single 2D numpy array
+
+
+    if len(ch[s['active_channels'][0]].shape) == 1:  # Only 1 sweep was given
+        #sweeps = ch[2]
         nb_sweeps = 1
         sweep_length = len(sweeps)
         single_sweep = True
-    else:
-        sweeps = ch[2]
-        nb_sweeps = sweeps.shape[0]  # Number of sweeps
-        sweep_length = sweeps.shape[1]  # Length of the sweeps
-        single_sweep = False
+    else:  # Extract a sweep from an ndarray of them
+        if single_sweep != -1:
+            #sweeps = sweeps[2][single_sweep]
+            sweeps = sweeps[single_sweep]  # Using last sweep only
+            nb_sweeps = 1
+            sweep_length = len(sweeps)
+            single_sweep = True
+        else:
+            #sweeps = ch[2]
+            nb_sweeps = sweeps.shape[0]  # Number of sweeps
+            sweep_length = sweeps.shape[1]  # Length of the sweeps
+            single_sweep = False
     fourier_len = sweep_length / 2
 
     """[TBR] Potentially subtract the background & all"""
@@ -300,7 +385,7 @@ def calculate_range_time(ch, s, single_sweep=-1):
     return im, nb_sweeps, max_range_index, m
 
 
-def find_start(f, start, nbytes_sweep):
+def find_start(f, start, s):
     done = False
     while not done:
         r = f.read(1)
@@ -315,7 +400,7 @@ def find_start(f, start, nbytes_sweep):
             current_position = f.tell()
             # Verify that what follows are full sweeps
             for j in range(1):
-                f.read(nbytes_sweep)  # Read a whole sweep
+                f.read(s['NBYTES_SWEEP'])  # Read a whole sweep
                 if f.read(1) != start:
                     done = False
                 next_frame_number = f.read(1)
@@ -328,20 +413,20 @@ def find_start(f, start, nbytes_sweep):
     return current_position, current_frame_number
 
 
-def import_data(f, start, first_frame, nbytes_sweep, samples, sweeps_to_drop, nb_channels=1, verbose=False):
+def import_data(f, start, first_frame, s, samples, verbose=False):
     #print("START", start)
     sweep_count = 0
     #sweep_count_2 = 0
-    signal = start[0]
-    counter_sweeps = 0
+    signal = s['start']
+    global_sweep_counter = 0
     #counter_sweeps_2 = 0
-    #skipped_frame_data = np.zeros((nbytes_sweep//4,), dtype=np.int16)
+    #skipped_frame_data = np.zeros((s['NBYTES_SWEEP']//4,), dtype=np.int16)
 
     current_frame_number = first_frame
     # The data will be stored in a dict of lists, the keys being the channel number
     data = dict()
     #data_2 = dict()
-    for k in range(nb_channels):
+    for k in range(s['channel_count']):
         data[k+1] = []
         #data_2[k + 1] = []
     data['skipped_sweeps'] = []  # Stores the skipped frames for both channels
@@ -352,23 +437,23 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, sweeps_to_drop, nb
         if verbose:
             print("\n[INFO] Current header [{}, {}] | sweep_data starting at: {}".format(signal, current_frame_number, f.tell()))
         t0 = time.perf_counter()
-        sweep_data = f.read(nbytes_sweep)  # Block read
+        sweep_data = f.read(s['NBYTES_SWEEP'])  # Block read
         t1 = time.perf_counter()
-        if len(sweep_data) != nbytes_sweep:
+        if len(sweep_data) != s['NBYTES_SWEEP']:
             break  # No more data, we have reached the end of the file
 
         # Read the header
         signal, next_frame_number = f.read(2) # Should get the next signal and frame_number
         restart = False
-        if signal != start[0]:
+        if signal != s['start']:
             if verbose:
                 print('[WARNING] Lost track of start at {} | Next header read: [{}, {}] but expected: [{}, {}]'
-                  .format(f.tell(), signal, next_frame_number, start[0], (current_frame_number+1)&0xff))
+                  .format(f.tell(), signal, next_frame_number, s['start'], (current_frame_number+1)&0xff))
             restart = True
         if restart == False and current_frame_number != None:
             if next_frame_number != (current_frame_number+1)&0xff:
                 if verbose:
-                    print('[WARNING] Lost a sweep at {} | Next header read: [{}, {}] but expected: [{}, {}]'.format(f.tell(), signal, next_frame_number, start[0], (current_frame_number+1)&0xff))
+                    print('[WARNING] Lost a sweep at {} | Next header read: [{}, {}] but expected: [{}, {}]'.format(f.tell(), signal, next_frame_number, s['start'], (current_frame_number+1)&0xff))
                 #assert 1==0
                 restart = True
 
@@ -376,29 +461,29 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, sweeps_to_drop, nb
             pos = f.tell()
             # Check in the data if a valid header can be found
             flag_success = False
-            for jj in range(nbytes_sweep)[::-1]:  # Go in reverse
-                if jj == nbytes_sweep-1:
-                    if sweep_data[jj] == start[0] and signal == (current_frame_number + 1) & 0xff:  # Check this if getting the chance
+            for jj in range(s['NBYTES_SWEEP'])[::-1]:  # Go in reverse
+                if jj == s['NBYTES_SWEEP']-1:
+                    if sweep_data[jj] == s['start'] and signal == (current_frame_number + 1) & 0xff:  # Check this if getting the chance
                         flag_success = True
                         break
-                elif sweep_data[jj] == start[0] and sweep_data[jj+1] == (current_frame_number+1)&0xff:
+                elif sweep_data[jj] == s['start'] and sweep_data[jj+1] == (current_frame_number+1)&0xff:
                     flag_success = True
                     break
 
             if flag_success:  # The next header was found in the previous sweep data: some data was dropped!
                 if verbose:
-                    print("[WARNING] Found next header [{}, {}] at position {} in the sweep_data of length {}".format(sweep_data[jj], sweep_data[jj+1], jj, nbytes_sweep))
+                    print("[WARNING] Found next header [{}, {}] at position {} in the sweep_data of length {}".format(sweep_data[jj], sweep_data[jj+1], jj, s['NBYTES_SWEEP']))
                 # Sanity check:
-                f.seek(pos - 2 - nbytes_sweep + jj)
+                f.seek(pos - 2 - s['NBYTES_SWEEP'] + jj)
                 signal, next_frame_number = f.read(2)  # Drop previous sweep
                 if verbose:
                     print('[WARNING] Jumped to {}, moved by {} byte'.format(f.tell(), f.tell()-pos))
-                    print("[WARNING] Skipping sweep {}. New header: [{}, {}] (overall sweep count: {})".format(current_frame_number, signal, next_frame_number, counter_sweeps))
+                    print("[WARNING] Skipping sweep {}. New header: [{}, {}] (overall sweep count: {})".format(current_frame_number, signal, next_frame_number, global_sweep_counter))
                 # Process the new location
                 current_frame_number = next_frame_number
 
                 if f.tell()-pos > 0:
-                    # Somehow the previous frame was nbytes_sweep and did not contain an issue
+                    # Somehow the previous frame was s['NBYTES_SWEEP'] and did not contain an issue
                     raise ValueError("[ERROR] Why was a correct header not found in the previous data?")
 
             else:
@@ -407,33 +492,33 @@ def import_data(f, start, first_frame, nbytes_sweep, samples, sweeps_to_drop, nb
             current_frame_number = next_frame_number
 
 
-        if sweep_count == sweeps_to_drop:
+        if sweep_count == s['sweeps_to_drop']:
             if verbose:
-                print("[INFO] Using this sweep : {}/{}".format(sweep_count, sweeps_to_drop))
+                print("[INFO] Using this sweep : {}/{}".format(sweep_count, s['sweeps_to_drop']))
             t0 = time.perf_counter()
             signed_data = np.frombuffer(sweep_data, dtype=np.int16)  # Does everything at once
             t1 = time.perf_counter()
 
             if restart:
                 if verbose:
-                    print("[WARNING] Due to restart, appending zeros for sweep {} (overall sweep counter: {})".format(current_frame_number-1, counter_sweeps))
-                signed_data = np.zeros((nbytes_sweep//2,), dtype=np.int16)
-                data['skipped_sweeps'].append(counter_sweeps)
+                    print("[WARNING] Due to restart, appending zeros for sweep {} (overall sweep counter: {})".format(current_frame_number-1, global_sweep_counter))
+                signed_data = np.zeros((s['NBYTES_SWEEP']//2,), dtype=np.int16)
+                data['skipped_sweeps'].append(global_sweep_counter)
             # Append channel data to respective list
-            for channel in range(nb_channels): # Channels number are 1 based for now
-                data[channel+1].append(signed_data[channel::nb_channels])
+            for channel in range(s['channel_count']): # Channels number are 1 based for now
+                data[channel+1].append(signed_data[channel::s['channel_count']])
             #print(data[1][0][:10])
             #print(data[2][0][:10])
             #assert not np.array_equal(data[1], data[2])
-            counter_sweeps += 1
+            global_sweep_counter += 1
             sweep_count = 0
         else: # Decimate sweep: should we interpolate the data or drop zeros?
             if verbose:
-                print("[INFO] Decimating sweep : {}/{}".format(sweep_count, sweeps_to_drop))
+                print("[INFO] Decimating sweep : {}/{}".format(sweep_count, s['sweeps_to_drop']))
             sweep_count += 1
 
     # Return numpy arrays rather than lists
-    for k in range(nb_channels):
+    for k in range(s['channel_count']):
         data[k+1] = np.array(data[k+1], dtype=np.int16)
     return data
 
@@ -526,35 +611,52 @@ def subtract_clutter(channel_data, w, data, clutter_averaging=1):
 
 
 class Writer(Thread):
-    def __init__(self, path_log_folder, queue, encoding='latin1', timeout=0.5):
+    def __init__(self, queue, s, encoding='latin1'):
         Thread.__init__(self)
 
         self.queue = queue
         self.encoding = encoding
+        self.wrote = 0
 
         if self.encoding == 'latin1':
-            self.path_log = os.path.join(path_log_folder, 'fmcw3.log')
-            self.f = open(self.path_log, 'w', encoding=self.encoding)
+            with open(s['path_raw_log'], 'w') as f:  # Write the settings to file
+                writer = csv.DictWriter(f, fieldnames=s.keys())
+                writer.writeheader()
+                writer.writerow(s)
+            print("[INFO] Opened {} for writing as {} file".format(s['path_raw_log'], self.encoding))
+            self.f = open(s['path_raw_log'], 'a', encoding=self.encoding)
         elif self.encoding == 'csv':
-            self.path_log = os.path.join(path_log_folder, 'fmcw3.csv')
-            self.f = open(self.path_log, 'w')
+            with open(s['path_csv_log'], 'w') as f:
+                writer = csv.DictWriter(f, fieldnames=s.keys())
+                writer.writeheader()
+                writer.writerow(s)
+            print("[INFO] Opened {} for writing as {} file".format(s['path_csv_log'], self.encoding))
+            self.f = open(s['path_csv_log'], 'a')
             self.writer = csv.writer(self.f)
+            self.writer.writerow('')
+            self.writer.writerow(['Timestamp', 'Sweep number', 'Channel'])
         else:
             raise ValueError('[ERROR] File encoding method {} unknown'.format(self.encoding))
-        self.timeout = timeout
-        print("[INFO] Opened {} for writing as {} file".format(self.path_log, self.encoding))
+        self.timeout = s['timeout']
+
+        # Write the settings to the file that was just open
+
 
     def run(self):
-        wrote = 0
         while True:
             try:
                 d = self.queue.get(True, self.timeout)
             except Empty:
-                print('[ERROR] Timeout after {} s without data | Wrote {} byte'.format(self.timeout, wrote))
+                if self.encoding == 'csv':
+                    print('[WARNING] {} Writer timedout after {} s without data | Wrote {} numbers to file'
+                          .format(self.encoding, self.timeout, self.wrote))
+                elif self.encoding == 'latin1':
+                    print('[WARNING] {} Writer timedout after {} s without data | Wrote {} byte'
+                          .format(self.encoding, self.timeout, self.wrote))
                 self.f.close()
                 return
             if len(d) == 0:
-                print('\n[INFO] Done after writing {:,} byte'.format(wrote))
+                print('\n[INFO] Done after writing {:,} byte'.format(self.wrote))
                 self.f.close()
                 return
             else:
@@ -562,86 +664,126 @@ class Writer(Thread):
                     self.f.write(d)
                 elif self.encoding == 'csv':
                     self.writer.writerow(d)
-                wrote += len(d)
+                self.wrote += len(d)
 
 
 class Decode(Thread):
-    def __init__(self, path_log_folder, queue, s, tfd_angles, timeout=0.5):
+    def __init__(self, queue, s, tfd_angles):
         Thread.__init__(self)
 
-        t = tfd_angles[0]
+        #t = tfd_angles[0]
+        # Initialize the channel data
+        self.rest = bytes("", encoding=s['ENCODING'])  # Start without a rest
+        self.global_sweep_counter = 0
+        self.next_header = [0, 0]
+        self.sweep_count = 0
 
+        # IO metrics
+        self.received = 0
+        self.sent = 0
+
+        # Saving stuff for the run method
+        self.s = s  # Need to keep a copy of the settings for the run loop
+        self.tfd_angles = tfd_angles
+
+        # Link the input queue
         self.raw_usb_to_decode = queue  # input queue
-        self.timeout = timeout
-        decoded_data_to_file = Queue()
-
+        self.timeout = s['timeout']
 
         # Write decoded batches to file
-        self.write_decoded_to_file = Writer(path_log_folder, decoded_data_to_file, 'csv', timeout)
+        self.decoded_data_to_file = Queue()  # Output queue
+        self.write_decoded_to_file = Writer(self.decoded_data_to_file, s, encoding='csv')
         self.write_decoded_to_file.start()
 
         # Spawn up to three new processes for the real time display
         # These processes take a single sweep as input and add it to current displays
         # Create the display objects
-        if_window = display.if_time_domain_animation(tfd_angles, s, grid=True)
-        angle_window = display.angle_animation(tfd_angles, s, method='cross-range')
-        max_range_index = int(
-            (4 * s['bw'] * (s['SWEEP_LENGTH'] / 2) * s['max_range']) / (
-                        s['c'] * s['if_amplifier_bandwidth'] * s['t_sweep']))
-        max_range_index = min(max_range_index, s['SWEEP_LENGTH'] // 2)
-        range_time_window = display.range_time_animation(s, max_range_index)
+
 
         # Spawn the process: the update_plot method will be called
-        #process_if_display = mp.Process(target=if_window.update_plot, args=(last_sweep, ts, clim))
-        #process_angle_display = mp.Process(target=angle_window.update_plot, args=(last_sweep, ts, clim))
-        #process_range_time_display = mp.Process(target=range_time_window.update_plot, args=(last_sweep, ts, clim))
+
 
     def run(self):
-        received = 0
-        sent = 0
+        if_window = display.if_time_domain_animation(self.tfd_angles, self.s, grid=True)
+        angle_window = display.angle_animation(self.tfd_angles, self.s, method='cross-range')
+        max_range_index = int(
+            (4 * self.s['bw'] * (self.s['SWEEP_LENGTH'] / 2) * self.s['max_range']) / (
+                    self.s['c'] * self.s['if_amplifier_bandwidth'] * self.s['t_sweep']))
+        max_range_index = min(max_range_index, self.s['SWEEP_LENGTH'] // 2)
+        range_time_window = display.range_time_animation(self.s, max_range_index)
+
+        t0 = time.perf_counter()
 
         while True:
+            # Get from queue
             try:
-                d = self.raw_usb_to_decode.get(True, self.timeout)
-                received += len(d)
+                new_batch = self.raw_usb_to_decode.get(True, self.timeout)
+                self.received += len(new_batch)
             except Empty:
-                print('[ERROR] Timeout after {} s without data | Wrote {} byte'.format(self.timeout, wrote))
+                print('[WARNING] Decode timedout after {} s without data'.format(self.timeout))
                 self.write_decoded_to_file.join()
                 return
-            if len(d) == 0:
-                print('\n[INFO] Done after writing {:,} byte'.format(wrote))
+
+            if len(new_batch) == 0:
+                print('\n[INFO] Decode is done after sending {:,} sweeps to the csv writer'.format(self.sent))
                 self.write_decoded_to_file.join()
                 return
-            else:  # Dynamic display
+            else:
                 # For now, the processes are started and stopped in here
-                # I. Send to write all complete sweeps
-                sweeps, rest = decode_data(self.rest+d)
+                # I. Decode that new batch
+                if type(new_batch) == str:
+                    new_batch = bytes(new_batch, encoding=self.s['ENCODING'])
+                batch_ch, next_header, rest, new_counter_sweeps, sweep_count = process_batch(self.rest, new_batch, self.s, self.next_header, self.sweep_count, self.global_sweep_counter, verbose=False)
+                self.next_header = next_header
                 self.rest = rest
-                decoded_data_to_file.put(sweeps)
-                sent += len(sweeps)
+                self.sweep_count = sweep_count
 
-                # II. Start all processes concurrently - hopefully they run on different CPUs
-                # IF TIME DOMAIN
-                if_data, clim = calculate_if_data({1: sweeps[1][-1], 2: sweeps[2][-1]}, s)
-                if_window.update_plot(if_data, time_stamp[1], 0)
-                #process_if_display.start()
 
-                # ANGLE PLOT
-                fxdb, clim = calculate_angle_plot([ch[1][plot_i], ch[2][plot_i]], s,
-                                                                         s['max_range'], d, s['swap_chs'], clim,
-                                                                         s['flag_Hanning'], angle_mask, timing,
-                                                                         operations)
-                #process_angle_display.start()
-                angle_window.update_plot(fxdb, time_stamp[1], clim)
+                # II. Send that new batch to be written on the csv file
+                for index in range(len(batch_ch[self.s['active_channels'][0]])):  # There is at least one channel
+                    for channel in self.s['active_channels']:  # All channels
+                        row = [self.s['T']*(self.global_sweep_counter + index), self.global_sweep_counter + index, channel] + batch_ch[channel][index].tolist()
+                        self.decoded_data_to_file.put(row)
+                self.sent += new_counter_sweeps - self.global_sweep_counter
 
-                # RANGE TIME
-                im, nb_sweeps, max_range_index, clim = calculate_range_time(ch, s, s['max_range'],
-                                                                                        s['kaiser_beta'],
-                                                                                        single_sweep=plot_i)
-                range_time_window.update_plot(im, time_stamp[1], clim)
-                #process_range_time_display.start()
+                print("Sweep: {} | Issued after: {:.3f} s | Decode timestamp: {:.3f} s"
+                      .format(self.global_sweep_counter, self.global_sweep_counter*self.s['T'], time.perf_counter()-t0))
 
-                # JOIN ALL PROCESSES
-                #process_if_display.join()
-                #process_angle_display.join()
-                #process_range_time_display.join()
+
+                # III. Start all processes concurrently - hopefully they run on different CPUs
+                for sweep_counter in range(self.global_sweep_counter, new_counter_sweeps):
+                    if sweep_counter%self.s['refresh_stride'] == 0:
+                        time_stamp = (None,
+                                      self.s['T'] * sweep_counter,
+                                      int(self.s['T'] * sweep_counter),
+                                      int(1000 * (self.s['T'] * sweep_counter - int(self.s['T'] * sweep_counter))))
+
+                        sweep_to_display = {channel: batch_ch[channel][sweep_counter-self.global_sweep_counter]
+                                       for channel in self.s['active_channels']}  # Isolate the sweep
+
+                        # IF TIME DOMAIN
+                        #process_if_display = mp.Process(target=if_window.refresh_data, args=(sweep_to_display, self.s, time_stamp[1]))
+                        # process_angle_display = mp.Process(target=angle_window.update_plot, args=(last_sweep, ts, clim))
+                        # process_range_time_display = mp.Process(target=range_time_window.update_plot, args=(last_sweep, ts, clim))
+
+                        if_data, clim = calculate_if_data(sweep_to_display, self.s)
+                        if_window.update_plot(if_data, time_stamp[1], 0)
+                        #process_if_display.start()
+
+                        # ANGLE PLOT
+                        clim = None
+                        fxdb, clim = calculate_angle_plot(sweep_to_display, self.s, clim, self.tfd_angles)
+                        #process_angle_display.start()
+                        #angle_window.update_plot(fxdb, time_stamp[1], clim)
+
+                        # RANGE TIME
+                        im, nb_sweeps, max_range_index, clim = calculate_range_time(sweep_to_display, self.s,
+                                                                                                single_sweep=0)
+                        range_time_window.update_plot(im, time_stamp[1], clim)
+                        #process_range_time_display.start()
+
+                        # JOIN ALL PROCESSES
+                        #process_if_display.join()
+                        #process_angle_display.join()
+                        #process_range_time_display.join()
+                self.global_sweep_counter = new_counter_sweeps

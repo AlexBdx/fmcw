@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
+import fmcw.postprocessing as postprocessing # ololololo
 plt.ion()
 
 
@@ -120,6 +120,10 @@ class if_time_domain_animation():
         self.fig.canvas.flush_events()
         self.fig.canvas.draw()
 
+    def refresh_data(self, sweep_to_display, s, time_stamp):
+        if_data, clim = postprocessing.calculate_if_data(sweep_to_display, s)
+        self.update_plot(if_data, time_stamp, 0)
+
     def __del__(self):
         plt.close(self.fig.number)
 
@@ -127,7 +131,8 @@ class if_time_domain_animation():
 class angle_animation():
     def __init__(self, tfd_angles, s, method='angle'):
         d = tfd_angles[2]
-        angles_masked = tfd_angles[4]
+        angles = tfd_angles[3]
+        angles_masked = angles[tfd_angles[4]]
 
         self.fig = plt.figure("Angle")
         self.method = method
@@ -210,7 +215,7 @@ class range_time_animation():
 
         # Create the meshgrid
         #t = np.linspace(0, overall_decimate * nb_sweeps * (s['t_sweep'] + s['t_delay']), nb_frames)
-        nb_sweeps = int(s['real_time_recall']/s['T'])  # Slightly lower
+        nb_sweeps = int(s['real_time_recall']/s['refresh_period'])+1
         t = np.linspace(-s['real_time_recall'], 0, nb_sweeps, endpoint=True)
         x, y = np.meshgrid(t, np.linspace(0,
         s['c'] * max_range_index * s['if_amplifier_bandwidth'] / (2 * nb_sweeps) / (s['bw'] / s['t_sweep']),
@@ -232,6 +237,9 @@ class range_time_animation():
         self.fig.canvas.draw()
         self.ax.set_title('Range-time plot\nCurrent: {:.3f} | Next: {:.3f}'.format(time_stamp, time_stamp))
 
+    def __del__(self):
+        plt.close(self.fig.number)
+    """[TBR]
     def display_manager(self, last_sweep):
         # Analyze the last_sweep dictionary
         if last_sweep['counter_sweep'] > self.counter_sweep:
@@ -241,5 +249,6 @@ class range_time_animation():
                           int(1000 * (last_sweep['T'] * last_sweep['counter_sweep'] - int(last_sweep['T'] * last_sweep['counter_sweep']))))
             self.update_plot(last_sweep['last_sweep'], time_stamp, last_sweep['clim'])
             self.counter_sweep = last_sweep['counter_sweep']
+    """
 
 
