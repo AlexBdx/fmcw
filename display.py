@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import fmcw.postprocessing as postprocessing # ololololo
-plt.ion()
-
 
 
 
@@ -115,14 +113,12 @@ class if_time_domain_animation():
     def update_plot(self, if_data, time_stamp, clim):
         for channel in if_data:
             self.lines[channel].set_ydata(if_data[channel])
-        self.ax.set_title('IF time-domain at time T = {:.3f} s'.format(time_stamp))
+        self.ax.set_title('IF time-domain at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
+                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
         # clim is not used but could be used to relay the maximum
         self.fig.canvas.flush_events()
         self.fig.canvas.draw()
 
-    def refresh_data(self, sweep_to_display, s, time_stamp):
-        if_data, clim = postprocessing.calculate_if_data(sweep_to_display, s)
-        self.update_plot(if_data, time_stamp, 0)
 
     def __del__(self):
         plt.close(self.fig.number)
@@ -181,7 +177,8 @@ class angle_animation():
 
         self.fig.canvas.flush_events()
         self.fig.canvas.draw()
-        self.ax.set_title("Angle plot at T = {:.3f} s".format(time_stamp))
+        self.ax.set_title('Angle plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
+                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
 
     def __del__(self):
         plt.close(self.fig.number)
@@ -235,20 +232,10 @@ class range_time_animation():
         self.quad.set_clim(clim - 80, clim)  # Updates the colorbar
         self.fig.canvas.flush_events()
         self.fig.canvas.draw()
-        self.ax.set_title('Range-time plot\nCurrent: {:.3f} | Next: {:.3f}'.format(time_stamp, time_stamp))
+        self.ax.set_title('Range time plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
+                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
 
     def __del__(self):
         plt.close(self.fig.number)
-    """[TBR]
-    def display_manager(self, last_sweep):
-        # Analyze the last_sweep dictionary
-        if last_sweep['counter_sweep'] > self.counter_sweep:
-            time_stamp = (None,
-                          last_sweep['T'] * last_sweep['counter_sweep'],
-                          int(last_sweep['T'] * last_sweep['counter_sweep']),
-                          int(1000 * (last_sweep['T'] * last_sweep['counter_sweep'] - int(last_sweep['T'] * last_sweep['counter_sweep']))))
-            self.update_plot(last_sweep['last_sweep'], time_stamp, last_sweep['clim'])
-            self.counter_sweep = last_sweep['counter_sweep']
-    """
 
 
