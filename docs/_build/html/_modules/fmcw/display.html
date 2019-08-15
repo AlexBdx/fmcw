@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fmcw.display &mdash; fmcw  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> fmcw
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">fmcw</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fmcw.display</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fmcw.display</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">fmcw.postprocessing</span> <span class="k">as</span> <span class="nn">postprocessing</span> <span class="c1"># ololololo</span>
+
+
+<div class="viewcode-block" id="plot_if_spectrum"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.display.plot_if_spectrum">[docs]</a><span class="k">def</span> <span class="nf">plot_if_spectrum</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">fir_gain</span><span class="p">,</span> <span class="n">adc_bits</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TO DO: NEEDS AN UPDATE TO REDUCE THE ARGUMENT COUNT VIA THE USE OF THE SETTINGS DICTIONARY</span>
+<span class="sd">    Plot the IF Fourier spectrum. Useful to see how much noise there is in the data and where</span>
+<span class="sd">    :param d: [m] distance bins TO DO: why is it here?</span>
+<span class="sd">    :param ch: Dictionary containing the data</span>
+<span class="sd">    :param sweep_number: sweep to plot</span>
+<span class="sd">    :param w: Window to use when processing the data</span>
+<span class="sd">    :param fir_gain: TO DO: will be superseeded by the settings dictionary</span>
+<span class="sd">    :param adc_bits: TO DO: will be superseeded by the settings dictionary</span>
+<span class="sd">    :param time_stamp: [bool] Save the data?</span>
+<span class="sd">    :param show_plot: [bool] Show the plot?</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;IF_spectrum_</span><span class="si">{:03d}</span><span class="s1">S</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">}</span>  <span class="c1"># Avoid &#39;skipped_frames&#39; key</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">:</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="n">ch</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="n">sweep_number</span><span class="p">]</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">fx</span> <span class="o">*=</span> <span class="n">w</span><span class="o">/</span><span class="p">(</span><span class="n">fir_gain</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">adc_bits</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fx</span><span class="p">))</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">fx</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Channel &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;IF spectrum for sweep </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Amplitude [dBFs]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Distance [m]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_if_time_domain"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.display.plot_if_time_domain">[docs]</a><span class="k">def</span> <span class="nf">plot_if_time_domain</span><span class="p">(</span><span class="n">fig_if</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD</span>
+<span class="sd">    Plot the IF data for a bunch of sweeps</span>
+<span class="sd">    :param fig_if:</span>
+<span class="sd">    :param t:</span>
+<span class="sd">    :param ch:</span>
+<span class="sd">    :param sweep_number:</span>
+<span class="sd">    :param s:</span>
+<span class="sd">    :param ylim:</span>
+<span class="sd">    :param time_stamp:</span>
+<span class="sd">    :param show_plot:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;IF_</span><span class="si">{:03d}</span><span class="s1">S</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">}</span>  <span class="c1"># Avoid &#39;skipped_frames&#39; key</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig_if</span><span class="p">)</span>
+    <span class="c1">#plt.ion()</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">:</span>
+        <span class="n">if_data</span> <span class="o">=</span> <span class="n">ch</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="n">sweep_number</span><span class="p">]</span>
+        <span class="n">if_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">if_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">if_data</span> <span class="o">*=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;fir_gain&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;adc_bits&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># No w</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">if_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Channel &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;IF time-domain at time T = </span><span class="si">{:.3f}</span><span class="s1"> s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Voltage [V]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_angle"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.display.plot_angle">[docs]</a><span class="k">def</span> <span class="nf">plot_angle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fxdb</span><span class="p">,</span> <span class="n">angles_masked</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">max_range</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD</span>
+<span class="sd">    Plot the angular data for a bunch of sweeps</span>
+<span class="sd">    :param t:</span>
+<span class="sd">    :param d:</span>
+<span class="sd">    :param fxdb:</span>
+<span class="sd">    :param angles_masked:</span>
+<span class="sd">    :param clim:</span>
+<span class="sd">    :param max_range:</span>
+<span class="sd">    :param time_stamp:</span>
+<span class="sd">    :param method:</span>
+<span class="sd">    :param show_plot:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;range_</span><span class="si">{:03d}</span><span class="s1">S</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;polar&#39;</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">imgplot</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">angles_masked</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fxdb</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;cross-range&#39;</span><span class="p">:</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">angles_masked</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">imgplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fxdb</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+        <span class="n">ylim</span> <span class="o">=</span> <span class="mi">90</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles_masked</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="c1">#plt.ylim([-ylim, ylim])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_range</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cross-range [m]&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">imgplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">angles_masked</span><span class="p">,</span> <span class="n">fxdb</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="n">angles_masked</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angles_masked</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_range</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Angle [$^o$]&quot;</span><span class="p">)</span>
+    <span class="n">imgplot</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="n">clim</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="n">clim</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Angle plot at T = </span><span class="si">{:.3f}</span><span class="s2"> s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Range [m]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="plot_range_time"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.display.plot_range_time">[docs]</a><span class="k">def</span> <span class="nf">plot_range_time</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">meshgrid_data</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD</span>
+<span class="sd">    Range time plot of a bunch of sweeps</span>
+<span class="sd">    :param t:</span>
+<span class="sd">    :param meshgrid_data:</span>
+<span class="sd">    :param m:</span>
+<span class="sd">    :param time_stamp:</span>
+<span class="sd">    :param show_plot:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Range-time_</span><span class="si">{:03d}</span><span class="s1">S</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Range [m]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Range-time plot&#39;</span><span class="p">)</span>
+    <span class="n">imgplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="o">*</span><span class="n">meshgrid_data</span><span class="p">)</span>
+    <span class="n">imgplot</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alexandre Bondoux
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,343 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fmcw.adc &mdash; fmcw  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> fmcw
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">fmcw</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fmcw.adc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fmcw.adc</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">Fraction</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">log</span>
+
+<div class="viewcode-block" id="ADF4158"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158">[docs]</a><span class="k">class</span> <span class="nc">ADF4158</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#Register definitions:</span>
+        <span class="c1"># (Register: name: (First bit, Length, [value]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_def</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:{</span><span class="s1">&#39;ramp_on&#39;</span><span class="p">:(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;muxout&#39;</span><span class="p">:(</span><span class="mi">27</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;n&#39;</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span> <span class="s1">&#39;frac_msb&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)},</span>
+                <span class="mi">1</span><span class="p">:{</span><span class="s1">&#39;reserved1&#39;</span><span class="p">:(</span><span class="mi">28</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;frac_lsb&#39;</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="s1">&#39;reserved2&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)},</span>
+                <span class="mi">2</span><span class="p">:{</span><span class="s1">&#39;reserved3&#39;</span><span class="p">:(</span><span class="mi">29</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s1">&#39;csr_en&#39;</span><span class="p">:(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;cp_current&#39;</span><span class="p">:(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;reserved4&#39;</span><span class="p">:(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;prescaler&#39;</span><span class="p">:(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;rdiv2&#39;</span><span class="p">:(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;reference_doubler&#39;</span><span class="p">:(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;r_counter&#39;</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;clk1_divider&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)},</span>
+                <span class="mi">3</span><span class="p">:{</span><span class="s1">&#39;reserved5&#39;</span><span class="p">:(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="s1">&#39;n_sel&#39;</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;sd_reset&#39;</span><span class="p">:(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;reserved6&#39;</span><span class="p">:(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="s1">&#39;ramp_mode&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;psk_enable&#39;</span><span class="p">:(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;fsk_enable&#39;</span><span class="p">:(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;ldp&#39;</span><span class="p">:(</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;pd_polarity&#39;</span><span class="p">:(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;power_down&#39;</span><span class="p">:(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;cp_threestate&#39;</span><span class="p">:(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;counter_reset&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+                <span class="mi">4</span><span class="p">:{</span><span class="s1">&#39;le_sel&#39;</span><span class="p">:(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;sd_mod_mode&#39;</span><span class="p">:(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;reserved7&#39;</span><span class="p">:(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;neg_bleed_current&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;readback_to_muxout&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="s1">&#39;clk_div_mode&#39;</span><span class="p">:(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;clk2_divider&#39;</span><span class="p">:(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="s1">&#39;reserved8&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)},</span>
+                <span class="mi">5</span><span class="p">:{</span><span class="s1">&#39;reserved9&#39;</span><span class="p">:(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;tx_ramp_clk&#39;</span><span class="p">:(</span><span class="mi">29</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;par_ramp&#39;</span><span class="p">:(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;interrupt&#39;</span><span class="p">:(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;fsk_ramp_en&#39;</span><span class="p">:(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;ramp2_en&#39;</span><span class="p">:(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;dev_sel&#39;</span><span class="p">:(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;dev_offset&#39;</span><span class="p">:(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;deviation&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">)},</span>
+                <span class="mi">6</span><span class="p">:{</span><span class="s1">&#39;reserved10&#39;</span><span class="p">:(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="s1">&#39;step_sel&#39;</span><span class="p">:(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;step&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">)},</span>
+                <span class="mi">7</span><span class="p">:{</span><span class="s1">&#39;reserved11&#39;</span><span class="p">:(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="s1">&#39;ramp_del_fl&#39;</span><span class="p">:(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;ramp_del&#39;</span><span class="p">:(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;del_clk_sel&#39;</span><span class="p">:(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;del_start_en&#39;</span><span class="p">:(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;delay_start_divider&#39;</span><span class="p">:(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)}</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">written_regs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span>
+
+        <span class="c1">#Check unique names</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#for key in self.register_def.itervalues():</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_def</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Duplicate register </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ADF4158.freq_to_regs"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.freq_to_regs">[docs]</a>    <span class="k">def</span> <span class="nf">freq_to_regs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fstart</span><span class="p">,</span> <span class="n">fpd_freq</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">rdiv2</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fstart</span><span class="o">/</span><span class="n">fpd_freq</span><span class="p">)</span>
+        <span class="n">frac_msb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="p">((</span><span class="n">fstart</span><span class="o">/</span><span class="n">fpd_freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">12</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">frac_lsb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(((</span><span class="n">fstart</span><span class="o">/</span><span class="n">fpd_freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">12</span><span class="p">)</span> <span class="o">-</span> <span class="n">frac_msb</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">13</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">frac_msb</span><span class="o">=</span><span class="n">frac_msb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">frac_lsb</span><span class="o">=</span><span class="n">frac_lsb</span><span class="p">)</span>
+
+        <span class="n">clk1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">fpd_freq</span><span class="o">*</span><span class="n">length</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">20</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">delay</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">clk1_d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">delay</span><span class="o">*</span><span class="n">fpd_freq</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clk1_d</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">clk1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">clk1</span><span class="p">,</span> <span class="n">clk1_d</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">clk1_divider</span><span class="o">=</span><span class="n">clk1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">clk2_divider</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fpd_freq</span><span class="o">*</span><span class="n">length</span><span class="o">/</span><span class="n">clk1</span><span class="p">)</span>
+
+        <span class="n">devmax</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span>
+        <span class="n">fres</span> <span class="o">=</span> <span class="n">fpd_freq</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="n">fdev</span> <span class="o">=</span> <span class="n">bw</span><span class="o">/</span><span class="n">steps</span>
+
+        <span class="n">dev_offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">fdev</span><span class="o">/</span><span class="p">(</span><span class="n">fres</span><span class="o">*</span><span class="n">devmax</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="n">dev_offset</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dev_offset</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">dev</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fdev</span><span class="o">/</span><span class="p">(</span><span class="n">fres</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">dev_offset</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">deviation</span><span class="o">=</span><span class="n">dev</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Acquisition parameters:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;steps</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;clk1</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">clk1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;fres</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fres</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;fdev</span><span class="se">\t\t\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fdev</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dev_offset</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dev_offset</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;deviation</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dev</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">dev_offset</span><span class="o">=</span><span class="n">dev_offset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">clk_div_mode</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">ramp_on</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">pd_polarity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">prescaler</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_counter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">csr_en</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#Readback to muxout and negative bleed current</span>
+        <span class="c1">#can&#39;t be activated simultaneously</span>
+        <span class="k">if</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">muxout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">readback_to_muxout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">neg_bleed_current</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1">#Sawtooth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">ramp_mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">delay</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">delay</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">fpd_freq</span><span class="p">:</span>
+                <span class="c1">#Use clk1 for delay clock.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">del_clk_sel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">delay</span><span class="o">*</span><span class="n">fpd_freq</span><span class="o">/</span><span class="n">clk1</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Too large delay: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+                <span class="n">real_delay</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">clk1</span><span class="o">/</span><span class="n">fpd_freq</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#Else the delay clock is same as fpd_freq</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">del_clk_sel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">delay</span><span class="o">*</span><span class="n">fpd_freq</span><span class="p">))</span>
+                <span class="n">real_delay</span> <span class="o">=</span> <span class="n">d</span><span class="o">/</span><span class="n">fpd_freq</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">ramp_del</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;d</span><span class="se">\t\t\t\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">delay_start_divider</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">real_delay</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">real_delay</span></div>
+
+<div class="viewcode-block" id="ADF4158.find_reg"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.find_reg">[docs]</a>    <span class="k">def</span> <span class="nf">find_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds register by name&quot;&quot;&quot;</span>
+        <span class="c1">#for key, val in self.register_def.iteritems():</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_def</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">[</span><span class="n">reg</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ADF4158.write_value"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.write_value">[docs]</a>    <span class="k">def</span> <span class="nf">write_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write value to register, doesn&#39;t update the device&quot;&quot;&quot;</span>
+        <span class="c1">#for reg, val in kw.iteritems():</span>
+        <span class="k">for</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print &quot;{} = {}&quot;.format(reg, val)</span>
+            <span class="n">reg_n</span><span class="p">,</span> <span class="n">reg_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_reg</span><span class="p">(</span><span class="n">reg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">reg_n</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Register </span><span class="si">{}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reg</span><span class="p">))</span>
+            <span class="n">reg_start</span> <span class="o">=</span> <span class="n">reg_def</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">reg_len</span> <span class="o">=</span> <span class="n">reg_def</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">**</span><span class="n">reg_len</span><span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value, got: </span><span class="si">{}</span><span class="s2">, maximum </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">reg_len</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1">#Clear previous value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="n">reg_n</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="o">~</span><span class="p">((((</span><span class="mi">2</span><span class="o">**</span><span class="n">reg_len</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">&amp;</span><span class="mh">0xFFFFFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">reg_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="n">reg_n</span><span class="p">]</span> <span class="o">|=</span> <span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">reg_start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modified</span><span class="p">[</span><span class="n">reg_n</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Alexandre Bondoux
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -20,10 +20,10 @@ fmcw.display module
     :undoc-members:
     :show-inheritance:
 
-fmcw.fmcw module
+fmcw.ftdi module
 ----------------
 
-.. automodule:: fmcw.fmcw
+.. automodule:: fmcw.ftdi
     :members:
     :undoc-members:
     :show-inheritance:

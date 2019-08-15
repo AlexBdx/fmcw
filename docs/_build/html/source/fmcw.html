@@ -84,7 +84,7 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-fmcw.adc">fmcw.adc module</a></li>
 <li><a class="reference internal" href="#module-fmcw.display">fmcw.display module</a></li>
-<li><a class="reference internal" href="#module-fmcw.fmcw">fmcw.fmcw module</a></li>
+<li><a class="reference internal" href="#module-fmcw.ftdi">fmcw.ftdi module</a></li>
 <li><a class="reference internal" href="#module-fmcw.postprocessing">fmcw.postprocessing module</a></li>
 <li><a class="reference internal" href="#module-fmcw">Module contents</a></li>
 </ul>
@@ -162,22 +162,22 @@
 <span id="fmcw-adc-module"></span><h2>fmcw.adc module<a class="headerlink" href="#module-fmcw.adc" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="fmcw.adc.ADF4158">
-<em class="property">class </em><code class="descclassname">fmcw.adc.</code><code class="descname">ADF4158</code><a class="headerlink" href="#fmcw.adc.ADF4158" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.adc.</code><code class="descname">ADF4158</code><a class="reference internal" href="../_modules/fmcw/adc.html#ADF4158"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.adc.ADF4158" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="fmcw.adc.ADF4158.find_reg">
-<code class="descname">find_reg</code><span class="sig-paren">(</span><em>reg</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.adc.ADF4158.find_reg" title="Permalink to this definition">¶</a></dt>
+<code class="descname">find_reg</code><span class="sig-paren">(</span><em>reg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/adc.html#ADF4158.find_reg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.adc.ADF4158.find_reg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds register by name</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fmcw.adc.ADF4158.freq_to_regs">
-<code class="descname">freq_to_regs</code><span class="sig-paren">(</span><em>fstart</em>, <em>fpd_freq</em>, <em>bw</em>, <em>length</em>, <em>delay</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.adc.ADF4158.freq_to_regs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">freq_to_regs</code><span class="sig-paren">(</span><em>fstart</em>, <em>fpd_freq</em>, <em>bw</em>, <em>length</em>, <em>delay</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/adc.html#ADF4158.freq_to_regs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.adc.ADF4158.freq_to_regs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="fmcw.adc.ADF4158.write_value">
-<code class="descname">write_value</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.adc.ADF4158.write_value" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_value</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/adc.html#ADF4158.write_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.adc.ADF4158.write_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write value to register, doesn’t update the device</p>
 </dd></dl>
 
@@ -188,7 +188,7 @@
 <span id="fmcw-display-module"></span><h2>fmcw.display module<a class="headerlink" href="#module-fmcw.display" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="fmcw.display.plot_angle">
-<code class="descclassname">fmcw.display.</code><code class="descname">plot_angle</code><span class="sig-paren">(</span><em>t</em>, <em>d</em>, <em>fxdb</em>, <em>angles_masked</em>, <em>clim</em>, <em>max_range</em>, <em>time_stamp</em>, <em>method=''</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.display.plot_angle" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.display.</code><code class="descname">plot_angle</code><span class="sig-paren">(</span><em>t</em>, <em>d</em>, <em>fxdb</em>, <em>angles_masked</em>, <em>clim</em>, <em>max_range</em>, <em>time_stamp</em>, <em>method=''</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/display.html#plot_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.display.plot_angle" title="Permalink to this definition">¶</a></dt>
 <dd><p>TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
 Plot the angular data for a bunch of sweeps
 :param t:
@@ -205,7 +205,7 @@ Plot the angular data for a bunch of sweeps
 
 <dl class="function">
 <dt id="fmcw.display.plot_if_spectrum">
-<code class="descclassname">fmcw.display.</code><code class="descname">plot_if_spectrum</code><span class="sig-paren">(</span><em>d</em>, <em>ch</em>, <em>sweep_number</em>, <em>w</em>, <em>fir_gain</em>, <em>adc_bits</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.display.plot_if_spectrum" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.display.</code><code class="descname">plot_if_spectrum</code><span class="sig-paren">(</span><em>d</em>, <em>ch</em>, <em>sweep_number</em>, <em>w</em>, <em>fir_gain</em>, <em>adc_bits</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/display.html#plot_if_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.display.plot_if_spectrum" title="Permalink to this definition">¶</a></dt>
 <dd><p>TO DO: NEEDS AN UPDATE TO REDUCE THE ARGUMENT COUNT VIA THE USE OF THE SETTINGS DICTIONARY
 Plot the IF Fourier spectrum. Useful to see how much noise there is in the data and where
 :param d: [m] distance bins TO DO: why is it here?
@@ -221,7 +221,7 @@ Plot the IF Fourier spectrum. Useful to see how much noise there is in the data 
 
 <dl class="function">
 <dt id="fmcw.display.plot_if_time_domain">
-<code class="descclassname">fmcw.display.</code><code class="descname">plot_if_time_domain</code><span class="sig-paren">(</span><em>fig_if</em>, <em>t</em>, <em>ch</em>, <em>sweep_number</em>, <em>s</em>, <em>ylim</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.display.plot_if_time_domain" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.display.</code><code class="descname">plot_if_time_domain</code><span class="sig-paren">(</span><em>fig_if</em>, <em>t</em>, <em>ch</em>, <em>sweep_number</em>, <em>s</em>, <em>ylim</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/display.html#plot_if_time_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.display.plot_if_time_domain" title="Permalink to this definition">¶</a></dt>
 <dd><p>TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
 Plot the IF data for a bunch of sweeps
 :param fig_if:
@@ -237,7 +237,7 @@ Plot the IF data for a bunch of sweeps
 
 <dl class="function">
 <dt id="fmcw.display.plot_range_time">
-<code class="descclassname">fmcw.display.</code><code class="descname">plot_range_time</code><span class="sig-paren">(</span><em>t</em>, <em>meshgrid_data</em>, <em>m</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.display.plot_range_time" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.display.</code><code class="descname">plot_range_time</code><span class="sig-paren">(</span><em>t</em>, <em>meshgrid_data</em>, <em>m</em>, <em>time_stamp</em>, <em>show_plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/display.html#plot_range_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.display.plot_range_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
 Range time plot of a bunch of sweeps
 :param t:
@@ -249,16 +249,16 @@ Range time plot of a bunch of sweeps
 </dd></dl>
 
 </div>
-<div class="section" id="module-fmcw.fmcw">
-<span id="fmcw-fmcw-module"></span><h2>fmcw.fmcw module<a class="headerlink" href="#module-fmcw.fmcw" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-fmcw.ftdi">
+<span id="fmcw-ftdi-module"></span><h2>fmcw.ftdi module<a class="headerlink" href="#module-fmcw.ftdi" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="fmcw.fmcw.FMCW3">
-<em class="property">class </em><code class="descclassname">fmcw.fmcw.</code><code class="descname">FMCW3</code><span class="sig-paren">(</span><em>ADC</em>, <em>encoding='latin1'</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA">
+<em class="property">class </em><code class="descclassname">fmcw.ftdi.</code><code class="descname">FPGA</code><span class="sig-paren">(</span><em>ADC</em>, <em>encoding='latin1'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Creates the FTDI object that handles the communication.</p>
+<p>Creates the FTDI object that handles the communication with the FPGA.</p>
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.clear_adc">
-<code class="descname">clear_adc</code><span class="sig-paren">(</span><em>oe1=False</em>, <em>oe2=False</em>, <em>shdn1=False</em>, <em>shdn2=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.clear_adc" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.clear_adc">
+<code class="descname">clear_adc</code><span class="sig-paren">(</span><em>oe1=False</em>, <em>oe2=False</em>, <em>shdn1=False</em>, <em>shdn2=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.clear_adc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.clear_adc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet signaling the ADC pins to clear on the FPGA.
 :param oe1: Clear Output Enable 1
 :param oe2: Clear Output Enable 2
@@ -268,15 +268,15 @@ Range time plot of a bunch of sweeps
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.clear_buffer">
-<code class="descname">clear_buffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.clear_buffer" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.clear_buffer">
+<code class="descname">clear_buffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.clear_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.clear_buffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear some buffer
 :return: Packet to be encapsulated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.clear_gpio">
-<code class="descname">clear_gpio</code><span class="sig-paren">(</span><em>led=False</em>, <em>pa_off=False</em>, <em>mix_enbl=False</em>, <em>adf_ce=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.clear_gpio" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.clear_gpio">
+<code class="descname">clear_gpio</code><span class="sig-paren">(</span><em>led=False</em>, <em>pa_off=False</em>, <em>mix_enbl=False</em>, <em>adf_ce=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.clear_gpio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.clear_gpio" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet signaling the GPIO pins to clear on the FPGA.
 :param led: Clear the LED
 :param pa_off: Clear pa_off
@@ -286,15 +286,15 @@ Range time plot of a bunch of sweeps
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.close">
-<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.close" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the FTDI object
 :return:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.send_packet">
-<code class="descname">send_packet</code><span class="sig-paren">(</span><em>x</em>, <em>cmd</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.send_packet" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.send_packet">
+<code class="descname">send_packet</code><span class="sig-paren">(</span><em>x</em>, <em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.send_packet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.send_packet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a header to a packet, encode it and write to FTDI.
 :param x: data
 :param cmd: type of packet
@@ -302,8 +302,8 @@ Range time plot of a bunch of sweeps
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.set_adc">
-<code class="descname">set_adc</code><span class="sig-paren">(</span><em>oe1=False</em>, <em>oe2=False</em>, <em>shdn1=False</em>, <em>shdn2=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.set_adc" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.set_adc">
+<code class="descname">set_adc</code><span class="sig-paren">(</span><em>oe1=False</em>, <em>oe2=False</em>, <em>shdn1=False</em>, <em>shdn2=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.set_adc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.set_adc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet signaling the ADC pins to set on the FPGA.
 :param oe1: Set Output Enable 1
 :param oe2: Set Output Enable 2
@@ -313,8 +313,8 @@ Range time plot of a bunch of sweeps
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.set_channels">
-<code class="descname">set_channels</code><span class="sig-paren">(</span><em>a=True</em>, <em>b=True</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.set_channels" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.set_channels">
+<code class="descname">set_channels</code><span class="sig-paren">(</span><em>a=True</em>, <em>b=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.set_channels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.set_channels" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: ONLY 2 CHANNELS SUPPORTED
 Set the channels to be activated (only two supported)
 :param a: State of channel a
@@ -323,8 +323,8 @@ Set the channels to be activated (only two supported)
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.set_downsampler">
-<code class="descname">set_downsampler</code><span class="sig-paren">(</span><em>enable=True</em>, <em>quarter=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.set_downsampler" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.set_downsampler">
+<code class="descname">set_downsampler</code><span class="sig-paren">(</span><em>enable=True</em>, <em>quarter=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.set_downsampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.set_downsampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: THE FPGA CODE REQUIRES IT TO BE ENABLED. TO DO: ALLOW THE USER TO DEACTIVATE IT
 Set the downsampler.
 :param enable: Turn it on
@@ -333,8 +333,8 @@ Set the downsampler.
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.set_gpio">
-<code class="descname">set_gpio</code><span class="sig-paren">(</span><em>led=False</em>, <em>pa_off=False</em>, <em>mix_enbl=False</em>, <em>adf_ce=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.set_gpio" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.set_gpio">
+<code class="descname">set_gpio</code><span class="sig-paren">(</span><em>led=False</em>, <em>pa_off=False</em>, <em>mix_enbl=False</em>, <em>adf_ce=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.set_gpio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.set_gpio" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet signaling the GPIO pins to set on the FPGA.
 :param led: Set the LED
 :param pa_off: Set the pa_off
@@ -344,8 +344,8 @@ Set the downsampler.
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.set_sweep">
-<code class="descname">set_sweep</code><span class="sig-paren">(</span><em>fstart</em>, <em>bw</em>, <em>length</em>, <em>delay</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.set_sweep" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.set_sweep">
+<code class="descname">set_sweep</code><span class="sig-paren">(</span><em>fstart</em>, <em>bw</em>, <em>length</em>, <em>delay</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.set_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.set_sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set sweep parameters.
 :param fstart: [Hz] Start frequency of the chirp
 :param bw: [Hz] Bandwidth to use
@@ -355,47 +355,47 @@ Set the downsampler.
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_decimate">
-<code class="descname">write_decimate</code><span class="sig-paren">(</span><em>decimate</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_decimate" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_decimate">
+<code class="descname">write_decimate</code><span class="sig-paren">(</span><em>decimate</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_decimate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_decimate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet to configure the decimation factor at the FPGA level.
 :param decimate: Number of sweeps to skip. 0 means no sweeps are skipped.
 :return: Packet to be encapsulated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_pa_off_timer">
-<code class="descname">write_pa_off_timer</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_pa_off_timer" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_pa_off_timer">
+<code class="descname">write_pa_off_timer</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_pa_off_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_pa_off_timer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the duration pa_off_timer to a number of ADC clock cycles
 :param length: number of clock cycles that represent the pa_off_timer
 :return: Packet to be encapsulated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_pll">
-<code class="descname">write_pll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_pll" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_pll">
+<code class="descname">write_pll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_pll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_pll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call for the configuration of all the registers.
 :return: void</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_pll_reg">
-<code class="descname">write_pll_reg</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_pll_reg" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_pll_reg">
+<code class="descname">write_pll_reg</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_pll_reg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_pll_reg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a packet to configure a PLL register.
 :param n: Configuration parameter
 :return: Packet to be encapsulated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_sweep_delay">
-<code class="descname">write_sweep_delay</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_sweep_delay" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_sweep_delay">
+<code class="descname">write_sweep_delay</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_sweep_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_sweep_delay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the duration between two sweeps (sweep delay) to a number of ADC clock cycles
 :param length: number of clock cycles that represent the duration between two sweeps
 :return: Packet to be encapsulated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fmcw.fmcw.FMCW3.write_sweep_timer">
-<code class="descname">write_sweep_timer</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.FMCW3.write_sweep_timer" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.FPGA.write_sweep_timer">
+<code class="descname">write_sweep_timer</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#FPGA.write_sweep_timer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.FPGA.write_sweep_timer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the duration of the sweep to a number of ADC clock cycles
 :param length: number of clock cycles that represent the duration of a sweep
 :return: Packet to be encapsulated</p>
@@ -404,14 +404,14 @@ Set the downsampler.
 </dd></dl>
 
 <dl class="class">
-<dt id="fmcw.fmcw.Writer">
-<em class="property">class </em><code class="descclassname">fmcw.fmcw.</code><code class="descname">Writer</code><span class="sig-paren">(</span><em>filename</em>, <em>queue</em>, <em>encoding='latin1'</em>, <em>timeout=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.Writer" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.Writer">
+<em class="property">class </em><code class="descclassname">fmcw.ftdi.</code><code class="descname">Writer</code><span class="sig-paren">(</span><em>filename</em>, <em>queue</em>, <em>encoding='latin1'</em>, <em>timeout=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#Writer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.Writer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></p>
 <p>DEPRECATED
 Legacy Writer thread used to write to the binary log file</p>
 <dl class="method">
-<dt id="fmcw.fmcw.Writer.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.fmcw.Writer.run" title="Permalink to this definition">¶</a></dt>
+<dt id="fmcw.ftdi.Writer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/ftdi.html#Writer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.ftdi.Writer.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method representing the thread’s activity.</p>
 <p>You may override this method in a subclass. The standard run() method
 invokes the callable object passed to the object’s constructor as the
@@ -426,7 +426,7 @@ from the args and kwargs arguments, respectively.</p>
 <span id="fmcw-postprocessing-module"></span><h2>fmcw.postprocessing module<a class="headerlink" href="#module-fmcw.postprocessing" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="fmcw.postprocessing.Writer">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">Writer</code><span class="sig-paren">(</span><em>queue</em>, <em>s</em>, <em>encoding='latin1'</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.Writer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">Writer</code><span class="sig-paren">(</span><em>queue</em>, <em>s</em>, <em>encoding='latin1'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#Writer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.Writer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></p>
 <p>Writer object that writes data to file. Created as a separate thread fed from a queue, so it’s not blocking.
 Nothing special about it. Comes in twpo flavors:
@@ -434,7 +434,7 @@ Nothing special about it. Comes in twpo flavors:
 - Writer for csv files</p>
 <dl class="method">
 <dt id="fmcw.postprocessing.Writer.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.Writer.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#Writer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.Writer.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process the data from the queue and write it to file.
 :return:</p>
 </dd></dl>
@@ -443,11 +443,11 @@ Nothing special about it. Comes in twpo flavors:
 
 <dl class="class">
 <dt id="fmcw.postprocessing.angle_animation">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">angle_animation</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>method='angle'</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.angle_animation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">angle_animation</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>method='angle'</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#angle_animation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.angle_animation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="fmcw.postprocessing.angle_animation.update_plot">
-<code class="descname">update_plot</code><span class="sig-paren">(</span><em>fxdb</em>, <em>time_stamp</em>, <em>clim</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.angle_animation.update_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_plot</code><span class="sig-paren">(</span><em>fxdb</em>, <em>time_stamp</em>, <em>clim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#angle_animation.update_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.angle_animation.update_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dynamic refresh of the angular plot.
 A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
 improvements, especially by messing with the backend directly.
@@ -474,12 +474,12 @@ TO DO: less data points could be plotted as an entire sweep is likely to contain
 
 <dl class="class">
 <dt id="fmcw.postprocessing.angle_display">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">angle_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_angle</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.angle_display" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">angle_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_angle</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#angle_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.angle_display" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.context.Process</span></code></p>
 <p>Sub-process to display the angular information coming from both receivers.</p>
 <dl class="method">
 <dt id="fmcw.postprocessing.angle_display.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.angle_display.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#angle_display.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.angle_display.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Angle sub-process loop
 :return:</p>
 </dd></dl>
@@ -488,7 +488,7 @@ TO DO: less data points could be plotted as an entire sweep is likely to contain
 
 <dl class="function">
 <dt id="fmcw.postprocessing.butter_highpass">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">butter_highpass</code><span class="sig-paren">(</span><em>cutoff</em>, <em>fs</em>, <em>order=4</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.butter_highpass" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">butter_highpass</code><span class="sig-paren">(</span><em>cutoff</em>, <em>fs</em>, <em>order=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#butter_highpass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.butter_highpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>User friendly wrapper for a highpass scipy.signal.butter
 :param cutoff: cutoff frequency
 :param fs: sampling frequency
@@ -498,7 +498,7 @@ TO DO: less data points could be plotted as an entire sweep is likely to contain
 
 <dl class="function">
 <dt id="fmcw.postprocessing.butter_highpass_filter">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">butter_highpass_filter</code><span class="sig-paren">(</span><em>data</em>, <em>cutoff</em>, <em>fs</em>, <em>order=4</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.butter_highpass_filter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">butter_highpass_filter</code><span class="sig-paren">(</span><em>data</em>, <em>cutoff</em>, <em>fs</em>, <em>order=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#butter_highpass_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.butter_highpass_filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter data with a highpass scipy.signal.butter
 :param data: Data to filter
 :param cutoff: Cutoff frequency
@@ -509,7 +509,7 @@ TO DO: less data points could be plotted as an entire sweep is likely to contain
 
 <dl class="function">
 <dt id="fmcw.postprocessing.calculate_angle_plot">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_angle_plot</code><span class="sig-paren">(</span><em>sweeps</em>, <em>s</em>, <em>clim</em>, <em>tfd_angles</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.calculate_angle_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_angle_plot</code><span class="sig-paren">(</span><em>sweeps</em>, <em>s</em>, <em>clim</em>, <em>tfd_angles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#calculate_angle_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.calculate_angle_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform the data processing to calculate the angular location of objects in a single sweep. The goal is to plot
 that result afterward, not to process multiple sweeps.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -533,7 +533,7 @@ that result afterward, not to process multiple sweeps.</p>
 
 <dl class="function">
 <dt id="fmcw.postprocessing.calculate_if_data">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_if_data</code><span class="sig-paren">(</span><em>sweeps</em>, <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.calculate_if_data" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_if_data</code><span class="sig-paren">(</span><em>sweeps</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#calculate_if_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.calculate_if_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.
 :param sweeps: Sweeps to consider
 :param s: Settings dictionary
@@ -542,7 +542,7 @@ that result afterward, not to process multiple sweeps.</p>
 
 <dl class="function">
 <dt id="fmcw.postprocessing.calculate_range_time">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_range_time</code><span class="sig-paren">(</span><em>ch</em>, <em>s</em>, <em>single_sweep=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.calculate_range_time" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">calculate_range_time</code><span class="sig-paren">(</span><em>ch</em>, <em>s</em>, <em>single_sweep=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#calculate_range_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.calculate_range_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a single sweep and calculate the distances of all signals. All the channels are averaged in a single virtual
 channel. While this is not super good practice, it is mostly okay given how far the objects are in comparison to the
 distance between antennas.
@@ -554,7 +554,7 @@ distance between antennas.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.compare_ndarrays">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">compare_ndarrays</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.compare_ndarrays" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">compare_ndarrays</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#compare_ndarrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.compare_ndarrays" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if two arrays are equivalent or not with additional details
 Helper function written to find quickly why two arrays are not equal element wise.
 :param a: Array 1
@@ -564,7 +564,7 @@ Helper function written to find quickly why two arrays are not equal element wis
 
 <dl class="function">
 <dt id="fmcw.postprocessing.create_bases">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">create_bases</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.create_bases" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">create_bases</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#create_bases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.create_bases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the x axis data for all sorts of plots. This will speed up the display of the plots by caching it and
 limiting the amount of data to be redrawn.
 :param s: Settings dictionary
@@ -573,7 +573,7 @@ limiting the amount of data to be redrawn.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.f_to_d">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">f_to_d</code><span class="sig-paren">(</span><em>f</em>, <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.f_to_d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">f_to_d</code><span class="sig-paren">(</span><em>f</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#f_to_d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.f_to_d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts frequency bins to distance bins based on ADC settings
 :param f: Frequency bins
 :param s: Settings dictionary
@@ -582,7 +582,7 @@ limiting the amount of data to be redrawn.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.find_start">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">find_start</code><span class="sig-paren">(</span><em>f</em>, <em>start</em>, <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.find_start" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">find_start</code><span class="sig-paren">(</span><em>f</em>, <em>start</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#find_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.find_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find a valid start header in a binary file by looking for two valid headers separated by the proper length of data.
 Given the simplicity of the system, it is not possible to guarantee that this data is “legit” as valid headers could
 be coming from random data. However, it is very unlikely.
@@ -595,7 +595,7 @@ coded on a single byte, so expect it to roll over after 255 is reached.</p>
 
 <dl class="function">
 <dt id="fmcw.postprocessing.find_start_batch">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">find_start_batch</code><span class="sig-paren">(</span><em>data</em>, <em>s</em>, <em>initial_index=0</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.find_start_batch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">find_start_batch</code><span class="sig-paren">(</span><em>data</em>, <em>s</em>, <em>initial_index=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#find_start_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.find_start_batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the starting index of the first valid batch of sweep data and its corresponding header.
 :param data: Batch of data coming from the FPGA via the USB port
 :param s: Settings dictionary
@@ -605,13 +605,13 @@ coded on a single byte, so expect it to roll over after 255 is reached.</p>
 
 <dl class="class">
 <dt id="fmcw.postprocessing.if_display">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">if_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_if</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.if_display" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">if_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_if</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#if_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.if_display" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.context.Process</span></code></p>
 <p>Sub-process for displaying the IF (Intermediate Frequency) data. These raw values coming out of the ADC (after
 FPGA filtering) are (almost) what make up the sweeps. There is a little bit of post-processing but not much.</p>
 <dl class="method">
 <dt id="fmcw.postprocessing.if_display.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.if_display.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#if_display.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.if_display.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>IF process loop</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -627,11 +627,11 @@ FPGA filtering) are (almost) what make up the sweeps. There is a little bit of p
 
 <dl class="class">
 <dt id="fmcw.postprocessing.if_time_domain_animation">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">if_time_domain_animation</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>grid=False</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.if_time_domain_animation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">if_time_domain_animation</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>grid=False</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#if_time_domain_animation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.if_time_domain_animation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="fmcw.postprocessing.if_time_domain_animation.update_plot">
-<code class="descname">update_plot</code><span class="sig-paren">(</span><em>if_data</em>, <em>time_stamp</em>, <em>clim</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.if_time_domain_animation.update_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_plot</code><span class="sig-paren">(</span><em>if_data</em>, <em>time_stamp</em>, <em>clim</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#if_time_domain_animation.update_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.if_time_domain_animation.update_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dynamic refresh of the IF plot.
 A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
 improvements, especially by messing with the backend directly.
@@ -647,7 +647,7 @@ available to it on the screen.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.import_data">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">import_data</code><span class="sig-paren">(</span><em>f</em>, <em>start</em>, <em>first_frame</em>, <em>s</em>, <em>samples</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.import_data" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">import_data</code><span class="sig-paren">(</span><em>f</em>, <em>start</em>, <em>first_frame</em>, <em>s</em>, <em>samples</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#import_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.import_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Import the data from a binary file. This was the source inspiration for process_batch, which is more up to date and
 deal with real time data. As a result, this might not be fully up to date.
 :param f: File handle
@@ -661,7 +661,7 @@ deal with real time data. As a result, this might not be fully up to date.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.move_figure">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">move_figure</code><span class="sig-paren">(</span><em>f</em>, <em>number</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.move_figure" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">move_figure</code><span class="sig-paren">(</span><em>f</em>, <em>number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#move_figure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.move_figure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move a figure to position (x, y) of the screen determined by the figure “number”. Only 3 positions supported.
 DO NOT REALY ON THIS FUNCTION. CANNOT BE GENERALIZED TO OTHER USE CASES THAN WHAT IT WAS DESIGNED FOR.
 Basically, only used it with Qt5Agg. Did not try other backends and the code is not complete for it. They are slower
@@ -673,7 +673,7 @@ than Qt when I tried, so not relevant. All units are px
 
 <dl class="function">
 <dt id="fmcw.postprocessing.process_batch">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">process_batch</code><span class="sig-paren">(</span><em>rest</em>, <em>data</em>, <em>s</em>, <em>next_header</em>, <em>counter_decimation</em>, <em>sweep_count</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.process_batch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">process_batch</code><span class="sig-paren">(</span><em>rest</em>, <em>data</em>, <em>s</em>, <em>next_header</em>, <em>counter_decimation</em>, <em>sweep_count</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#process_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.process_batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function to process incoming batches of data from the FPGA. The goal is to find valid sweeps in the data. Main 
 challenges are that the start of the data might come from the end of a previous sweep, there might be some dropped 
 byte in some sweeps due to latency from the OS vs real time FPGA, and a last sweep that is incomplete and has to be 
@@ -690,7 +690,7 @@ merged with the next batch.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.r4_normalize">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">r4_normalize</code><span class="sig-paren">(</span><em>x</em>, <em>d</em>, <em>e=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.r4_normalize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">r4_normalize</code><span class="sig-paren">(</span><em>x</em>, <em>d</em>, <em>e=1.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#r4_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.r4_normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Not sure what this does. Used when processing the angle data
 :param x:
 :param d:
@@ -700,11 +700,11 @@ merged with the next batch.
 
 <dl class="class">
 <dt id="fmcw.postprocessing.range_time_animation">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">range_time_animation</code><span class="sig-paren">(</span><em>s</em>, <em>max_range_index</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.range_time_animation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">range_time_animation</code><span class="sig-paren">(</span><em>s</em>, <em>max_range_index</em>, <em>blit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#range_time_animation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.range_time_animation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="fmcw.postprocessing.range_time_animation.update_plot">
-<code class="descname">update_plot</code><span class="sig-paren">(</span><em>im</em>, <em>time_stamp</em>, <em>clim</em>, <em>sweeps_skipped</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.range_time_animation.update_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_plot</code><span class="sig-paren">(</span><em>im</em>, <em>time_stamp</em>, <em>clim</em>, <em>sweeps_skipped</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#range_time_animation.update_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.range_time_animation.update_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dynamic refresh of the Range time plot
 A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
 improvements, especially by messing with the backend directly.
@@ -721,11 +721,11 @@ available to it on the screen.
 
 <dl class="class">
 <dt id="fmcw.postprocessing.range_time_display">
-<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">range_time_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_range_time</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.range_time_display" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fmcw.postprocessing.</code><code class="descname">range_time_display</code><span class="sig-paren">(</span><em>tfd_angles</em>, <em>s</em>, <em>data_accessible</em>, <em>new_sweep_range_time</em>, <em>sweep_to_display</em>, <em>time_stamp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#range_time_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.range_time_display" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.context.Process</span></code></p>
 <dl class="method">
 <dt id="fmcw.postprocessing.range_time_display.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.range_time_display.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#range_time_display.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.range_time_display.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Range time sub-process loop
 :return:</p>
 </dd></dl>
@@ -734,7 +734,7 @@ available to it on the screen.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.read_settings">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">read_settings</code><span class="sig-paren">(</span><em>f</em>, <em>encoding=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.read_settings" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">read_settings</code><span class="sig-paren">(</span><em>f</em>, <em>encoding=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#read_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.read_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the first line of a file and evaluates it as python code. Used when reading the binary log as the first line
 contains the settings dictionary.
 :param f: File handle
@@ -744,7 +744,7 @@ contains the settings dictionary.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.subtract_background">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">subtract_background</code><span class="sig-paren">(</span><em>channel_data</em>, <em>w</em>, <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.subtract_background" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">subtract_background</code><span class="sig-paren">(</span><em>channel_data</em>, <em>w</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#subtract_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.subtract_background" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED?
 Subtract the mean to a list of sweeps and multiply the result by the weights w. One thing to note, is that sweeps
 full of zeros (coming from corrupted usb data) are left invariant.
@@ -756,7 +756,7 @@ full of zeros (coming from corrupted usb data) are left invariant.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.subtract_clutter">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">subtract_clutter</code><span class="sig-paren">(</span><em>channel_data</em>, <em>w</em>, <em>data</em>, <em>clutter_averaging=1</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.subtract_clutter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">subtract_clutter</code><span class="sig-paren">(</span><em>channel_data</em>, <em>w</em>, <em>data</em>, <em>clutter_averaging=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#subtract_clutter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.subtract_clutter" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED?
 Subtract to a sweep the average of the previous clutter_averaging sweeps. It’s some kind of moving average. The
 goal is to perform motion detection a lot more easily.
@@ -769,7 +769,7 @@ goal is to perform motion detection a lot more easily.
 
 <dl class="function">
 <dt id="fmcw.postprocessing.twos_comp">
-<code class="descclassname">fmcw.postprocessing.</code><code class="descname">twos_comp</code><span class="sig-paren">(</span><em>val</em>, <em>bits</em><span class="sig-paren">)</span><a class="headerlink" href="#fmcw.postprocessing.twos_comp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fmcw.postprocessing.</code><code class="descname">twos_comp</code><span class="sig-paren">(</span><em>val</em>, <em>bits</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/postprocessing.html#twos_comp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.postprocessing.twos_comp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the 2’s complement of int value val
 :param val: Bytes to complement
 :param bits:
@@ -793,7 +793,7 @@ goal is to perform motion detection a lot more easily.
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Alex Bondoux
+        &copy; Copyright 2019, Alexandre Bondoux
 
     </p>
   </div>
