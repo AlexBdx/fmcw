@@ -11,9 +11,8 @@ Welcome to fmcw's documentation!
    :caption: Contents:
 
    source/modules
-   README
 
-Here we go. For some reason, the doc seems to be in Index > fmcw (on the left) > module of your choice. To be improved...
+Here we go. For some reason, the build of the autodoc of the docstring is successful, I see the html pages, but they are not displayed on the web...
 
 Indices and tables
 ==================
