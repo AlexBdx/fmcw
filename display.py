@@ -4,9 +4,19 @@ import os
 import fmcw.postprocessing as postprocessing # ololololo
 
 
-
 def plot_if_spectrum(d, ch, sweep_number, w, fir_gain, adc_bits, time_stamp, show_plot=False):
-    # IF spectrum plot
+    """TO DO: NEEDS AN UPDATE TO REDUCE THE ARGUMENT COUNT VIA THE USE OF THE SETTINGS DICTIONARY
+    Plot the IF Fourier spectrum. Useful to see how much noise there is in the data and where
+    :param d: [m] distance bins TO DO: why is it here?
+    :param ch: Dictionary containing the data
+    :param sweep_number: sweep to plot
+    :param w: Window to use when processing the data
+    :param fir_gain: TO DO: will be superseeded by the settings dictionary
+    :param adc_bits: TO DO: will be superseeded by the settings dictionary
+    :param time_stamp: [bool] Save the data?
+    :param show_plot: [bool] Show the plot?
+    :return:
+    """
     if time_stamp[0]:
         save_path = os.path.join(time_stamp[0], 'IF_spectrum_{:03d}S{}.png'.format(time_stamp[2], time_stamp[3]))
     ch = {k: v for k, v in ch.items() if type(k) == int}  # Avoid 'skipped_frames' key
@@ -31,7 +41,18 @@ def plot_if_spectrum(d, ch, sweep_number, w, fir_gain, adc_bits, time_stamp, sho
 
 
 def plot_if_time_domain(fig_if, t, ch, sweep_number, s, ylim, time_stamp, show_plot=False):
-    # IF time domain
+    """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
+    Plot the IF data for a bunch of sweeps
+    :param fig_if:
+    :param t:
+    :param ch:
+    :param sweep_number:
+    :param s:
+    :param ylim:
+    :param time_stamp:
+    :param show_plot:
+    :return:
+    """
     if time_stamp[0]:
         save_path = os.path.join(time_stamp[0], 'IF_{:03d}S{}.png'.format(time_stamp[2], time_stamp[3]))
     ch = {k: v for k, v in ch.items() if type(k) == int}  # Avoid 'skipped_frames' key
@@ -54,13 +75,22 @@ def plot_if_time_domain(fig_if, t, ch, sweep_number, s, ylim, time_stamp, show_p
         plt.savefig(save_path)
     if show_plot:
         plt.show()
-    #plt.close()
-    
-
 
 
 def plot_angle(t, d, fxdb, angles_masked, clim, max_range, time_stamp, method='', show_plot=False):
-    # Angle plots
+    """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
+    Plot the angular data for a bunch of sweeps
+    :param t:
+    :param d:
+    :param fxdb:
+    :param angles_masked:
+    :param clim:
+    :param max_range:
+    :param time_stamp:
+    :param method:
+    :param show_plot:
+    :return:
+    """
     plt.ioff()
     if time_stamp[0]:
         save_path = os.path.join(time_stamp[0], 'range_{:03d}S{}.png'.format(time_stamp[2], time_stamp[3]))
@@ -95,96 +125,16 @@ def plot_angle(t, d, fxdb, angles_masked, clim, max_range, time_stamp, method=''
     plt.close()
     plt.ion()
 
-class if_time_domain_animation():
-    def __init__(self, tfd_angles, s, grid=False):
-        t = tfd_angles[0]
-        self.fig = plt.figure("IF time domain")
-        self.ax = self.fig.add_subplot(111)
-        self.ax.set_xlabel('Time [s]')
-        self.ax.set_ylabel('Voltage [V]')
-        self.lines = {}
-        for channel in range(1, s['channel_count']+1):  # Channels are 1 based due to hardware considerations
-            self.lines[channel] = self.ax.plot(t, np.zeros((len(t),)), label='CH'+str(channel))[0]  # Grab first in list
-        self.ax.set_xlim([0, t[-1]])
-        self.ax.set_ylim([-1, 1])
-        self.ax.legend(loc='best')
-        self.ax.grid(grid)
-
-    def update_plot(self, if_data, time_stamp, clim):
-        for channel in if_data:
-            self.lines[channel].set_ydata(if_data[channel])
-        self.ax.set_title('IF time-domain at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
-                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
-        # clim is not used but could be used to relay the maximum
-        self.fig.canvas.flush_events()
-        self.fig.canvas.draw()
-
-
-    def __del__(self):
-        plt.close(self.fig.number)
-
-
-class angle_animation():
-    def __init__(self, tfd_angles, s, method='angle'):
-        d = tfd_angles[2]
-        angles = tfd_angles[3]
-        angles_masked = angles[tfd_angles[4]]
-
-        self.fig = plt.figure("Angle")
-        self.method = method
-        fxdb = np.zeros((len(angles_masked), len(d)))
-
-        if self.method == 'polar':
-            self.ax = self.fig.add_subplot(111, polar=True)
-            self.quad = self.ax.pcolormesh(angles_masked * np.pi / 180, d, fxdb.transpose())
-            self.ax.set_xlabel("???")
-            self.ax.set_ylabel("???")
-        elif self.method == 'cross-range':
-            self.ax = self.fig.add_subplot(111)
-            #self.ax.set_xlim([0, max_range])
-            self.ax.set_xlabel("Range [m]")
-            ylim = 90 * np.sin(angles_masked[0] * np.pi / 180)
-            ylim = [-ylim, ylim]
-            #self.ax.set_ylim(ylim)
-            # self.ax.set_ylim([-30, 30])
-            self.ax.set_ylabel("Cross-range [m]")
-            r, t = np.meshgrid(d, angles_masked * np.pi / 180)
-            x = r * np.cos(t)
-            y = -r * np.sin(t)
-            self.quad = self.ax.pcolormesh(x, y, fxdb)
-            self.ax.axis('equal')
-        elif self.method == 'angle':
-            self.ax = self.fig.add_subplot(111)
-            self.quad = self.ax.pcolormesh(d, angles_masked, fxdb)
-            self.ax.set_xlim([d[0], s['max_range']])
-            self.ax.set_xlabel("Range [m]")
-            self.ax.set_ylim([angles_masked[0], angles_masked[-1]])
-            self.ax.set_ylabel("Angle [$^o$]")
-        else:
-            raise ValueError('[ERROR] Incorrect method for the angle plots')
-
-        self.colorbar = self.fig.colorbar(self.quad, ax=self.ax)
-
-    def update_plot(self, fxdb, time_stamp, clim):
-        #plt.figure(self.fig.number)  # Grab the focus
-
-        if self.method == 'polar':
-            fxdb = fxdb.transpose()
-        # https://stackoverflow.com/questions/18797175/animation-with-pcolormesh-routine-in-matplotlib-how-do-i-initialize-the-data
-        # https://stackoverflow.com/questions/29009743/using-set-array-with-pyplot-pcolormesh-ruins-figure
-        self.quad.set_array(fxdb[:-1,:-1].ravel())
-        self.quad.set_clim(clim - 50, clim)  # Updates the colorbar
-
-        self.fig.canvas.flush_events()
-        self.fig.canvas.draw()
-        self.ax.set_title('Angle plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
-                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
-
-    def __del__(self):
-        plt.close(self.fig.number)
-
 def plot_range_time(t, meshgrid_data, m, time_stamp, show_plot=False):
-    # Range time plot
+    """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
+    Range time plot of a bunch of sweeps
+    :param t:
+    :param meshgrid_data:
+    :param m:
+    :param time_stamp:
+    :param show_plot:
+    :return:
+    """
     if time_stamp[0]:
         save_path = os.path.join(time_stamp[0], 'Range-time_{:03d}S{}.png'.format(time_stamp[2], time_stamp[3]))
     plt.figure()
@@ -200,42 +150,3 @@ def plot_range_time(t, meshgrid_data, m, time_stamp, show_plot=False):
     if show_plot:
         plt.show()
     plt.close()
-
-class range_time_animation():
-    def __init__(self, s, max_range_index):
-        self.fig = plt.figure("Range-time")
-        self.ax = self.fig.add_subplot(111)
-        self.ax.set_xlim([-s['real_time_recall'], 0])
-        self.ax.set_xlabel("Time [s]")
-        #self.ax.set_ylim([angles_masked[0], angles_masked[-1]])
-        self.ax.set_ylabel("Range [m]")
-
-        # Create the meshgrid
-        #t = np.linspace(0, overall_decimate * nb_sweeps * (s['t_sweep'] + s['t_delay']), nb_frames)
-        nb_sweeps = int(s['real_time_recall']/s['refresh_period'])+1
-        t = np.linspace(-s['real_time_recall'], 0, nb_sweeps, endpoint=True)
-        x, y = np.meshgrid(t, np.linspace(0,
-        s['c'] * max_range_index * s['if_amplifier_bandwidth'] / (2 * nb_sweeps) / (s['bw'] / s['t_sweep']),
-                                          max_range_index-2))
-
-        # Store the value currently displayed for speed
-        self.current_array = np.zeros((max_range_index-2, nb_sweeps))
-        self.quad = self.ax.pcolormesh(x, y, self.current_array)
-        self.colorbar = self.fig.colorbar(self.quad, ax=self.ax)
-
-    def update_plot(self, im, time_stamp, clim):
-        # Current values are rolled by the length of the new im array
-        self.current_array = np.roll(self.current_array, -1, axis=1)  # Column roll
-        self.current_array[:, -1] = im  # Substitute the new array
-
-        self.quad.set_array(self.current_array[:-1, :-1].ravel())  # Flatten the data
-        self.quad.set_clim(clim - 80, clim)  # Updates the colorbar
-        self.fig.canvas.flush_events()
-        self.fig.canvas.draw()
-        self.ax.set_title('Range time plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
-                          .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
-
-    def __del__(self):
-        plt.close(self.fig.number)
-
-

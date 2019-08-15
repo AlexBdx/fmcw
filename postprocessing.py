@@ -318,6 +318,12 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
 
 
 def calculate_if_data(sweeps, s):
+    """
+    Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.
+    :param sweeps: Sweeps to consider
+    :param s: Settings dictionary
+    :return: Voltage is returned as a dict with each key being a channel. clim is the max differential voltage.
+    """
     assert type(sweeps) == dict
     if_data = {}
     clim = s['max_differential_voltage']
@@ -327,7 +333,7 @@ def calculate_if_data(sweeps, s):
         data *= 1 / (s['fir_gain'] * 2 ** (s['adc_bits'] - 1))  # No w
         if_data[channel] = data
 
-    return if_data, clim  # dict
+    return if_data, clim
 
 
 def calculate_angle_plot(sweeps, s, clim, tfd_angles):
