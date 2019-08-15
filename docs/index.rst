@@ -12,6 +12,8 @@ Welcome to fmcw's documentation!
 
    source/modules
 
+Here we go. For some reason, the doc seems to be in Index > fmcw (on the left) > module of your choice. To be improved...
+
 Indices and tables
 ==================
 
