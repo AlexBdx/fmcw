@@ -6,13 +6,18 @@
 Welcome to fmcw's documentation!
 ================================
 
+This library provides high level access to the FMCW3 radar. It provides the necessary building blocks to automatically handle configuration of the FPGA, reception of the data and post-processing of it. With reasonable settings, most users should even be able to be able to display a few plots in real time.
+
+Table Of Contents:
+==================
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    source/modules
 
-Here we go. For some reason, the build of the autodoc of the docstring is successful, I see the html pages, but they are not displayed on the web...
+
 
 Indices and tables
 ==================

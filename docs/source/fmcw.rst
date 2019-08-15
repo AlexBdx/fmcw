@@ -1,6 +1,8 @@
 fmcw package
 ============
 
+The fmcw package contains a few modules handling various aspects of it.
+
 Submodules
 ----------
 
