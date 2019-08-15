@@ -1,14 +1,7 @@
 import pylibftdi as ftdi
-#from adf4158 import ADF4158
-#import adf4158
-#from Queue import Queue, Empty
 from queue import Queue, Empty
 from threading import Thread
 import datetime
-#import time
-#import argparse
-#import os
-#print(ftdi.__file__)
 
 class FMCW3():
     def __init__(self, ADC, encoding='latin1'):
