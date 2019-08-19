@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fmcw",
-    version="0.3.26",
+    version="0.3.27",
     author="Alex Bondoux",
     author_email="alexandre.bdx@gmail.com",
     description="Library for fmcw radar",
