@@ -117,7 +117,7 @@ def find_start_batch(data, s, initial_index=0):
     :return: Starting index of a sweep data, header of that sweep
     """
     flag_valid_header = False
-    for index in range(initial_index, len(data) - s['nbytes_sweep'] - 2):  # index starts at 0
+    for index in range(initial_index, len(data) - s['nbytes_sweep'] - 2):
         current_header = [data[index], data[index + 1]]
         if current_header[0] == s['start'] and data[index + s['nbytes_sweep'] + 2] == s[
             'start']:  # Not 100% foolproof, but cannot be anyway
@@ -130,12 +130,13 @@ def find_start_batch(data, s, initial_index=0):
     if flag_valid_header:  # All good
         index += 2  # Skip the header, it is saved in current_header
     else:
-        index = -1  # No valid header was found
-        current_header = []
-        print("[WARNING] No valid header found when searching for a start signal")
+        # index = -1  # No valid header was found
+        current_header = [0, 0]
         #print("[ERROR] index: {} | len(data): {} | s['nbytes_sweep']: {}".format(index, len(data), s['nbytes_sweep']))
         #raise ValueError('[ERROR] No valid header found in the data!')
 
+    assert index > 0
+    assert current_header[0] == 127 or current_header[0] == 0
     return index, current_header
 
 def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, verbose=False):
@@ -153,12 +154,24 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
     :param verbose: A lot of extra info will be displayed
     :return: batch_ch, next_header, rest, sweep_count, counter_decimation
     """
-    # Sanity checks
+    # Sanity checks on types
     assert type(rest)==bytes or rest == None
     assert type(data)==bytes
     assert type(s['start'])==int
     assert type(s['nbytes_sweep'])==int
     assert type(next_header)==list
+
+    # Sanity checks on length
+    assert len(next_header) == 2
+    assert type(next_header[0] == np.int8) and type(next_header[1] == np.int8)
+    assert len(data) + len(rest) > 0
+
+    # Sanity check on nature of next_header
+    assert next_header[0] in [0, 1, s['start']]  # Can be the start signal or an error code
+
+    # print(len(data), len(rest))
+    if len(rest) > len(data):
+        print(len(data), len(rest))
     # 0. Create temp variables
     #counter_decimation = 0  # For software decimation
     sweeps_scanned = 0
@@ -171,41 +184,64 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
 
     # 1. Concatenate the rest with the data
     initial_data_length = len(data)  # DEBUG
-    if rest != None:
-        data = rest + data  # Concatenate the bytearrays
+    data = rest + data  # Concatenate the bytearrays
+    if len(data) > s['patience_data_length']:  # Threshold in data length
+        raise ValueError('[ERROR] No valid header found in these {} byte of data'.format(len(data)))
 
     if verbose:
         print("[INFO] rest length: {} | block: {} long | shape to process: {}".format(len(rest), initial_data_length, len(data)))
     assert type(data) == bytes
 
     # 2. Find the start
-    if next_header[0] == 0:  # Either no previous data or the previous frame did not end w/ valid header
-        if next_header[1]:  # The previous batch ended without a valid next header
+    if next_header[0] != s['start']:  # The start was not found
+        # This can happen if the previous sweep ended with a lot of data but no valid header.
+        # All the remaining data was carried over as rest. Once a new valid header is found, we can see how many
+        # sweeps were skipped and fill batch_ch with the corresponding amount of 0s. Should be rare to skip so many
+        # sweep unless very few bytes are read on the USB port.
+
+        # CASE 1: [0, 0] - No valid header ever found
+        if next_header[0] == 0:  # This is the first time we go through process_batch
+            index, next_header = find_start_batch(data, s)
+            if next_header[0] == 0:  # valid header not found - need more data to get started
+                print("[WARNING] No valid header found when searching for a start signal for a case [0, 0]")
+                rest = data
+                return batch_ch, next_header, rest, sweep_count, counter_decimation
+            else:
+                # Found a valid header. Let's get started with the main while loop!
+                assert next_header[0] == s['start']
+
+        # CASE 2: [1, N] - The backward search failed previously
+        elif next_header[0] == 1:  # The previous batch ended without a valid next header but has a frame_number
             current_frame_number = next_header[1]
-            index, next_header = find_start_batch(data, s)
-            sweeps_scanned = (next_header[1] - current_frame_number)&0xff
+            index, next_header = find_start_batch(data, s)  # Start searching from the start
+            if next_header[0] == 0:  # valid header not found - need more data to get started
+                print("[WARNING] No valid header found when searching for a start signal for a case [1, N]")
+                next_header = [1, current_frame_number]  # Restore header
+                rest = data
+                return batch_ch, next_header, rest, sweep_count, counter_decimation
+            else:  # Sucess! A valid header was found. Append the required 0s for the skipped sweeps
+                assert next_header[0] == s['start']
+                print("[INFO] Recovered from backward search failure with", next_header)
+                sweeps_scanned = (next_header[1] - current_frame_number)&0xff
+                for _ in range(sweeps_scanned):  # Add all the required zeros before getting started
+                    if counter_decimation == s['soft_decimate']:
+                        signed_data = skipped_data  # Will append just 0s. Frame is skipped
+                        batch_ch['skipped_sweeps'].append(sweep_count)
 
-            for _ in range(sweeps_scanned):  # Add all the required zeros before getting started
-                if counter_decimation == s['soft_decimate']:
-                    signed_data = skipped_data  # Will append just 0s. Frame is skipped
-                    batch_ch['skipped_sweeps'].append(sweep_count)
+                        for channel in range(s['channel_count']):  # Channels number are 1 based for now
+                            batch_ch[channel + 1].append(signed_data[channel::s['channel_count']])  # Data is entangled
 
-                    for channel in range(s['channel_count']):  # Channels number are 1 based for now
-                        batch_ch[channel + 1].append(signed_data[channel::s['channel_count']])  # Data is entangled
+                        # Increment counters
+                        counter_decimation = 0
+                        sweep_count += 1  # Only count sweeps after decimation
+                    else:  # Decimate sweep: should we interpolate the data or drop zeros?
+                        if verbose:
+                            print("[INFO] Decimating sweep : {}/{}".format(counter_decimation, s['soft_decimate']))
+                        counter_decimation += 1
+                sweeps_scanned = 0
+                print("[INFO] Done recovering ", next_header)
 
-                    # Increment counters
-                    counter_decimation = 0
-                    sweep_count += 1  # Only count sweeps after decimation
-                else:  # Decimate sweep: should we interpolate the data or drop zeros?
-                    if verbose:
-                        print("[INFO] Decimating sweep : {}/{}".format(counter_decimation, s['soft_decimate']))
-                    counter_decimation += 1
-            sweeps_scanned = 0
-
-        else:
-            index, next_header = find_start_batch(data, s)
-            assert len(next_header)  # If false, means that no valid start found in the whole batch!
-    else:  # There is a valid previous header.
+    else:  # There is a valid previous header!
         index = 0  # rest+data will be scanned from the start
         if verbose:
             print("[INFO] Starting with header", next_header)
@@ -218,12 +254,23 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
 
     assert type(data) == bytes
     assert type(next_header[0]==np.int8)
-    # 3. Process the batches
-    while index+s['nbytes_sweep']+2 < len(data):  # As long as we can scoop the next batch and header
+    try:
+        assert next_header[0] == s['start']  # All issues must have been solved before getting to the main loop
+    except:
+        print(next_header)
+        raise
+    assert index >= 0  # Cannot be negative otherwise creates a wreck
+
+    # 3. Process the batches as long as they are valid.
+    while index+s['nbytes_sweep']+2 < len(data) and next_header[0] == s['start']:
         # 3.1 Scoop the next s['nbytes_sweep'] and the following header
         if verbose:
             print("\n[INFO] Reading sweep", current_frame_number)
         batch = data[index:index+s['nbytes_sweep']]
+        if len(batch) == 0:
+            print("Debug 2")
+            print(index, len(data), s['nbytes_sweep'])
+            raise
         next_header = [data[index+s['nbytes_sweep']], data[index+s['nbytes_sweep']+1]]
 
         # 3.2 First case: the header is valid
@@ -245,19 +292,23 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
 
             # Option 1: Look for the start of the correct next_header in the dropped data
             for jj in range(s['nbytes_sweep'])[::-1]:  # Go in reverse
-                if jj == s['nbytes_sweep'] - 1:
-                    # if sweep_data[jj] == s['start'] and next_frame_number == (current_frame_number+1)&0xff:  # I think this is wrong
-                    if batch[jj] == s['start'] and next_header[0] == (current_frame_number + 1) & 0xff:  # Check this
-                        next_header = [batch[jj], next_header[0]]
-                        # raise
+                try:  # DEBUG
+                    if jj == s['nbytes_sweep'] - 1:
+                        # if sweep_data[jj] == s['start'] and next_frame_number == (current_frame_number+1)&0xff:  # I think this is wrong
+                        if batch[jj] == s['start'] and next_header[0] == (current_frame_number + 1)&0xff:  # Check this
+                            next_header = [batch[jj], next_header[0]]  # Only 1 int16 was lost
+                            break
+
+                    elif batch[jj] == s['start'] and batch[jj + 1] == (current_frame_number + 1)&0xff:
+                        next_header = [batch[jj], batch[jj+1]]  # Cast batch values to int and put them in a list
                         break
-                    else:
-                        next_header = []
-                elif batch[jj] == s['start'] and batch[jj + 1] == (current_frame_number + 1) & 0xff:
-                    next_header = [batch[jj], batch[jj+1]]
-                    break
-            # Restart from that location
-            if len(next_header):
+                except:
+                    print("DEBUG")
+                    print(jj, len(batch))
+                    print(next_header)
+                    assert 0
+            # Process the result of that backward search
+            if next_header == [s['start'], (current_frame_number + 1) & 0xff]:  # Valid header!
                 if verbose:
                     print("[WARNING] Found header {} at {}".format(next_header, index+jj))
                     print("[WARNING] Skipping sweep {} from {} to {}.".format(current_frame_number, index, index+s['nbytes_sweep']))
@@ -265,22 +316,27 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
                 index += jj + 2 # Skip the next_header and get ready to scoop s['nbytes_sweep'] of data
                 sweeps_scanned = (next_header[1] - current_frame_number) & 0xff
                 assert sweeps_scanned == 1  # Debug
-            else:
+            else:  # Backward pass failed
                 # Option 2: Search for the header forward
-                print("[WARNING] Dropping sweep as the next header was not found in previous data.")
+                print("[WARNING] Failed backward search. Header must have been lost.")
+                next_header = [1, (current_frame_number+1)& 0xff]  # Signal that the backward search failed
+                assert jj == 0
+                index += s['nbytes_sweep']  # Skip the whole "expected" sweep.
+                sweeps_scanned = 1  # This sweep will be ignored
+                """[TBR] Previously tried to find forward the next header
                 index, next_header = find_start_batch(data, s, initial_index=index)
                 print("[WARNING] Current sweep number: {} | Next header count: {}"
                       .format(current_frame_number, next_header[1]))
-                if index == -1:
-                    # Failed to find a valid header
-                    index = len(data) - 1  # No rest will be generated
+
+                if next_header[0] == 0:  # Failed to find a valid header forward
+                    index = len(data)  # No rest will be generated
                     next_header = [0, current_frame_number]  # Communicate
                     sweeps_scanned = 0  # Skip channel assignement
-                    print('[ERROR] Next header not found in previous incorrect frame nor rest of frame.')
-                else:
+                    print('[WARNING] Next header not found in previous incorrect frame nor rest of frame.')
+                else:  # Valid header found in forward data
                     sweeps_scanned = (next_header[1] - current_frame_number) & 0xff  # Could be > 1
+                """
 
-         # 1 for the backward pass, >= 1 for fwd
         current_frame_number = next_header[1]  # Ready to read the next sweep
 
         # 3.3 Append data if we are not decimating
@@ -310,7 +366,7 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
     # Return numpy arrays rather than lists
     for k in range(s['channel_count']):
         batch_ch[k + 1] = np.array(batch_ch[k + 1], dtype=np.int16)
-    rest = data[index:]  # Get the rest
+    rest = data[index:]  # Get the rest if index < length(data) else []
     if verbose:
         print("\n[INFO] There is a rest of length", len(rest))
     
@@ -322,29 +378,27 @@ def calculate_if_data(sweeps, s):
     Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.
     :param sweeps: Sweeps to consider
     :param s: Settings dictionary
-    :return: Voltage is returned as a dict with each key being a channel. clim is the max differential voltage.
+    :return: Voltage is returned as a dict with each key being a channel.
     """
     assert type(sweeps) == dict
     if_data = {}
-    clim = s['max_differential_voltage']
 
     for channel in sweeps: # Go through all available channels
         data = np.array(sweeps[channel], dtype=np.float)
         data *= 1 / (s['fir_gain'] * 2 ** (s['adc_bits'] - 1))  # No w
         if_data[channel] = data
 
-    return if_data, clim
+    return if_data
 
 
-def calculate_angle_plot(sweeps, s, clim, tfd_angles):
+def calculate_angle_plot(sweeps, s, tfd_angles):
     """Perform the data processing to calculate the angular location of objects in a single sweep. The goal is to plot
     that result afterward, not to process multiple sweeps.
 
     :param sweeps: Data from which the angle position will be calculated
     :param s: Settings dictionary
-    :param clim: Maximum value of the data. If None, it will be calculated
     :param tfd_angles: Tuple containing all the bins important for the plotting
-    :return: fxdb, clim
+    :return: fxdb
     """
     # WARNING: ONLY 2 CHANNELS SUPPORTED SO FAR
     assert type(sweeps) == dict
@@ -374,10 +428,13 @@ def calculate_angle_plot(sweeps, s, clim, tfd_angles):
 
     fx = np.fft.fftshift(np.fft.fft(x, axis=0, n=s['angle_pad']), axes=0)
     fx = r4_normalize(fx, d)
-    if clim is None:
+
+    if 0:  # Calculate the min/max to use with the color bar
         max_range_i = np.searchsorted(d, s['max_range'])
-        clim = np.max(20 * np.log10(np.abs(fx[:max_range_i, :]))) + 10
-    if fxm is None:
+        cblim = np.max(20 * np.log10(np.abs(fx[:max_range_i, :]))) + 10
+        cblim = [cblim-50, cblim]  # min max array
+
+    if fxm is None: # Apply coefficients ?
         fx = coefs[0] * fx
     else:  # k is not defined anymore, would have to get it from original files
         fx += coefs[k] * fx
@@ -396,7 +453,7 @@ def calculate_angle_plot(sweeps, s, clim, tfd_angles):
     fxdb = 20 * np.log10(np.abs(fx))
 
 
-    return fxdb, clim
+    return fxdb
 
 
 def calculate_range_time(ch, s, single_sweep=-1):
@@ -407,7 +464,7 @@ def calculate_range_time(ch, s, single_sweep=-1):
     :param ch: dict containing the sweep data for each channel
     :param s: Settings dictionary
     :param single_sweep: Sweep to select in the dictionary in case there are actually multiple of them. To be removed.
-    :return: im, nb_sweeps, max_range_index, clim
+    :return: im, nb_sweeps, max_range_index
     """
     # WARNING: ONLY USING CHANNEL 2 FOR THAT
     # Take the average of all channels
@@ -444,7 +501,6 @@ def calculate_range_time(ch, s, single_sweep=-1):
 
     im = np.zeros((max_range_index - 2, nb_sweeps))
     w = [1]*sweep_length if single_sweep else np.kaiser(sweep_length, s['kaiser_beta'])
-    clim = 0
 
     for e in range(nb_sweeps):
         sw = sweeps if single_sweep else sweeps[e]
@@ -457,12 +513,14 @@ def calculate_range_time(ch, s, single_sweep=-1):
         fy = np.fft.rfft(sw)[3:max_range_index + 1]  # FFT of the sweep
         fy = 20 * np.log10((s['adc_ref'] / (2 ** (s['adc_bits'] - 1) * s['fir_gain'] * max_range_index)) * np.abs(fy))
         fy = np.clip(fy, -100, float('inf'))
-        clim = max(clim, max(fy))  # Track max value for fxdb
         im[:, e] = np.array(fy)
-        #im[:, e] = fy
         im = np.array(fy) if single_sweep else im
 
-    return im, nb_sweeps, max_range_index, clim
+    if 0:
+        cblim = [min(im), max(im, 0)]
+
+
+    return im, nb_sweeps, max_range_index
 
 
 def find_start(f, start, s):
@@ -864,7 +922,7 @@ class if_display(mp.Process):
             data = {key:arr[index] for index, key in enumerate(self.s['active_channels'])}  # dict for compatibility
 
             # 4. Process the IF data
-            if_data, clim = calculate_if_data(data, self.s)
+            if_data = calculate_if_data(data, self.s)
 
             # 5. Sanity checks: did we skip some refreshes for being too slow?
             sweeps_skipped = int(round((time_stamp[0] - self.previous_sweep_counter) / self.s['refresh_stride'])) - 1
@@ -877,7 +935,7 @@ class if_display(mp.Process):
                               sweeps_skipped))
 
             # 6. Update the figure
-            self.window.update_plot(if_data, time_stamp, 0)
+            self.window.update_plot(if_data, time_stamp)
 
             # 7. Set the necessary counters and flags
             self.previous_sweep_counter = int(time_stamp[0])
@@ -909,7 +967,8 @@ class if_time_domain_animation():
         self.ax.set_ylabel('Voltage [V]')
         self.lines = {}
         self.ax.set_xlim([0, t[-1]])
-        self.ax.set_ylim([-s['max_differential_voltage'], s['max_differential_voltage']])
+        if s['cblim_if'] != []:  # Set the color bar limits if they have been defined. Otherwise, dynamic.
+            self.ax.set_ylim(s['cblim_if'])
         self.ax.grid(grid)
 
         # 3. Display initial data (zeros) to activate the figure
@@ -925,7 +984,7 @@ class if_time_domain_animation():
             # cache the background
             self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)
 
-    def update_plot(self, if_data, time_stamp, clim):
+    def update_plot(self, if_data, time_stamp):
         """Dynamic refresh of the IF plot.
         A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
         improvements, especially by messing with the backend directly.
@@ -933,7 +992,6 @@ class if_time_domain_animation():
         available to it on the screen.
         :param if_data: processed IF data from a sweep
         :param time_stamp: Timestamp for the current sweep
-        :param clim: Maximum of the current data
         :return:
         """
         for channel in if_data:  # Update y-data only, for all active channels
@@ -941,7 +999,6 @@ class if_time_domain_animation():
 
         self.ax.set_title('IF time-domain at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
                           .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))  # Update title
-        # clim is not used but could be used to relay the maximum
 
         if self.blit:  # Given the performance boost, should be the default case
             self.fig.canvas.restore_region(self.axbackground)  # restore background
@@ -1009,8 +1066,7 @@ class angle_display(mp.Process):
             data = {key: arr[index] for index, key in enumerate(self.s['active_channels'])}  # dict for compatibility
 
             # 4. Process the data to determine the angular components
-            clim = None  # The maximum of a sweep will be automatically calculated
-            fxdb, clim = calculate_angle_plot(data, self.s, clim, self.tfd_angles)
+            fxdb = calculate_angle_plot(data, self.s, self.tfd_angles)
 
             # 5. Sanity checks: did we skip some refreshes for being too slow?
             sweeps_skipped = int(round((time_stamp[0] - self.previous_sweep_counter) / self.s['refresh_stride'])) - 1
@@ -1023,7 +1079,7 @@ class angle_display(mp.Process):
                               sweeps_skipped))
 
             # 6. Update the figure
-            self.window.update_plot(fxdb, time_stamp, clim)
+            self.window.update_plot(fxdb, time_stamp)
 
             # 7. Set the necessary counters and flags
             self.previous_sweep_counter = int(time_stamp[0])
@@ -1080,6 +1136,7 @@ class angle_animation():
         else:
             raise ValueError('[ERROR] Incorrect method for the angle plots')
 
+
         # 3. Display initial data (zeros) to activate the figure
         self.fig.canvas.draw()  # Get ready to cache this
 
@@ -1100,8 +1157,10 @@ class angle_animation():
             raise ValueError('[ERROR] Incorrect method for the angle plots')
 
         self.colorbar = self.fig.colorbar(self.quad, ax=self.ax)
+        if s['cblim_angle'] != []:  # Set the color bar limits if they have been defined. Otherwise, dynamic.
+            self.quad.set_clim(*s['cblim_angle'])
 
-    def update_plot(self, fxdb, time_stamp, clim):
+    def update_plot(self, fxdb, time_stamp):
         """Dynamic refresh of the angular plot.
         A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
         improvements, especially by messing with the backend directly.
@@ -1109,7 +1168,6 @@ class angle_animation():
 
         :param fxdb: Angular data to plot
         :param time_stamp: Timestamp for the current sweep
-        :param clim: Maximum of the current data
         :return:
         """
 
@@ -1118,7 +1176,7 @@ class angle_animation():
         # https://stackoverflow.com/questions/18797175/animation-with-pcolormesh-routine-in-matplotlib-how-do-i-initialize-the-data
         # https://stackoverflow.com/questions/29009743/using-set-array-with-pyplot-pcolormesh-ruins-figure
         self.quad.set_array(fxdb[:-1, :-1].ravel())
-        self.quad.set_clim(clim - 50, clim)  # Updates the colorbar
+        # self.quad.set_clim(*cblim)  # Updates the colorbar
 
         self.ax.set_title('Angle plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
                           .format(time_stamp[1], time_stamp[2], time_stamp[2] - time_stamp[1]))
@@ -1190,7 +1248,7 @@ class range_time_display(mp.Process):
             data = {key: arr[index] for index, key in enumerate(self.s['active_channels'])}
 
             # 4. Process the data to determine the angular components
-            im, nb_sweeps, max_range_index, clim = calculate_range_time(data, self.s, single_sweep=0)
+            im, nb_sweeps, max_range_index = calculate_range_time(data, self.s, single_sweep=0)
 
             # 5. Sanity checks: did we skip some refreshes for being too slow?
             sweeps_skipped = int(round((time_stamp[0]-self.previous_sweep_counter)/self.s['refresh_stride']))-1
@@ -1205,7 +1263,7 @@ class range_time_display(mp.Process):
                               sweeps_skipped))
 
             # 6. Update the figure
-            self.window.update_plot(im, time_stamp, clim, sweeps_skipped)
+            self.window.update_plot(im, time_stamp, sweeps_skipped)
 
             # 7. Set the necessary counters and flags
             self.previous_sweep_counter = int(time_stamp[0])
@@ -1214,7 +1272,7 @@ class range_time_display(mp.Process):
             #print("RT loop duration: mean: {:.3f} s | std: {:.3f} s".format(np.mean(self.timing), np.std(self.timing)))
 
     def __del__(self):
-        print("Range time is terminating")
+        print("[INFO] Range time is terminating")
 
 
 class range_time_animation():
@@ -1245,13 +1303,18 @@ class range_time_animation():
         self.quad = self.ax.pcolormesh(x, y, self.current_array)
         self.colorbar = self.fig.colorbar(self.quad, ax=self.ax)
 
+
         # 4. If blitting, cache background
         self.blit = blit
         if self.blit:
             # cache the background
             self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)
 
-    def update_plot(self, im, time_stamp, clim, sweeps_skipped):
+        #self.quad.set_array(self.current_array[:-1, :-1].ravel())
+        if s['cblim_range_time'] != []:  # Set the color bar limits if they have been defined. Otherwise, dynamic.
+            self.quad.set_clim(*s['cblim_range_time'])
+
+    def update_plot(self, im, time_stamp, sweeps_skipped):
         """Dynamic refresh of the Range time plot
         A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
         improvements, especially by messing with the backend directly.
@@ -1259,7 +1322,6 @@ class range_time_animation():
         available to it on the screen.
         :param im: range time data
         :param time_stamp: Timestamp for the current sweep
-        :param clim: Maximum of the current data
         :param sweeps_skipped: Important here to duplicate the current sweep as many times as sweeps we skipped
         :return:
         """
@@ -1272,7 +1334,7 @@ class range_time_animation():
         self.current_array[:, -sweeps_skipped-1:] =  im # Substitute the new array & pad
 
         self.quad.set_array(self.current_array[:-1, :-1].ravel())  # Flatten the data
-        self.quad.set_clim(clim - 80, clim)  # Updates the colorbar
+        # self.quad.set_clim(*cblim)  # Updates the colorbar
         self.ax.set_title('Range time plot at time T = {:.3f} s | FPGA time: {:.1f} s (lag: {:.1f} s)'
                           .format(time_stamp[1], time_stamp[2], time_stamp[2]-time_stamp[1]))
 

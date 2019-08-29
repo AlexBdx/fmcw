@@ -1,7 +1,10 @@
+import matplotlib
+# matplotlib.use('TkAgg')  # Use another backend
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import fmcw.postprocessing as postprocessing # ololololo
+import csv
 
 
 def plot_if_spectrum(d, ch, sweep_number, w, fir_gain, adc_bits, time_stamp, show_plot=False):
@@ -125,7 +128,7 @@ def plot_angle(t, d, fxdb, angles_masked, clim, max_range, time_stamp, method=''
     plt.close()
     plt.ion()
 
-def plot_range_time(t, meshgrid_data, m, time_stamp, show_plot=False):
+def plot_range_time(t, im, s, time_stamp=''):
     """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
     Range time plot of a bunch of sweeps
     :param t:
@@ -135,18 +138,61 @@ def plot_range_time(t, meshgrid_data, m, time_stamp, show_plot=False):
     :param show_plot:
     :return:
     """
-    if time_stamp[0]:
-        save_path = os.path.join(time_stamp[0], 'Range-time_{:03d}S{}.png'.format(time_stamp[2], time_stamp[3]))
+    plt.ioff()
+    max_range_index = int(s['sweep_length'] * s['max_range'] / s['range_adc'])
+    max_range_index = min(max_range_index, s['sweep_length'] // 2)
+    x, y = np.meshgrid(t, np.linspace(0, s['range_adc']*max_range_index/s['sweep_length'], max_range_index-2))
+
+    if time_stamp:
+        save_path = os.path.join(os.path.split(s['path_csv_log'])[0], time_stamp[:-1]+'.png')
     plt.figure()
     plt.ylabel("Range [m]")
     plt.xlabel("Time [s]")
     plt.xlim([t[0], t[-1]])
-    plt.title('Range-time plot')
-    imgplot = plt.pcolormesh(*meshgrid_data)
-    imgplot.set_clim(m-80,m)
+    plt.title('Overall Range-time plot for '+time_stamp[:-1])
+    imgplot = plt.pcolormesh(x, y, im)
+    imgplot.set_clim(*s['cblim_range_time'])
     plt.colorbar()
-    if time_stamp[0]:
-        plt.savefig(save_path)
-    if show_plot:
-        plt.show()
-    plt.close()
+
+    if matplotlib.get_backend() == 'Qt5Agg':
+        manager = plt.get_current_fig_manager()
+        manager.window.showMaximized()
+    elif matplotlib.get_backend() == 'TkAgg':
+        manager = plt.get_current_fig_manager()
+        manager.resize(*manager.window.maxsize())
+    elif matplotlib.get_backend() == 'WXAgg':
+        manager = plt.get_current_fig_manager()
+        manager.frame.Maximize(True)
+    else:
+        raise ValueError('Not sure how to maximize image with this backend')
+
+    if time_stamp:
+        plt.savefig(save_path, bbox_inches = 'tight', dpi=300)
+    plt.show()
+
+
+
+def import_settings(path, timestamp):
+    with open(os.path.join(path, timestamp+'settings.csv')) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            s = row
+        for key in s:
+            try:
+                s[key] = eval(s[key])
+            except NameError:
+                print("[WARNING] {} has no interpretation, probably a str setting. No action taken.".format(key))
+            except SyntaxError:
+                print("[WARNING] {} has no valid interpretation, probably a str setting. No action taken.".format(key))
+    return s
+
+def import_csv(path, timestamp, s):
+    with open(os.path.join(path, timestamp+'fmcw3.csv')) as f:
+        reader = csv.reader(f)
+        next(reader)
+        data = {channel: [] for channel in s['active_channels']}
+        for row in reader:  # Place the rows in the right channel
+            data[eval(row[2])].append(row[3:])
+        for channel in data:
+            data[channel] = np.array(data[channel], dtype=np.int16)
+        return data
