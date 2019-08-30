@@ -38,6 +38,14 @@ fmcw.postprocessing module
     :undoc-members:
     :show-inheritance:
 
+fmcw.preprocessing module
+--------------------------
+
+.. automodule:: fmcw.preprocessing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

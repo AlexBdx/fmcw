@@ -156,6 +156,7 @@
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">fmcw</span> <span class="k">import</span> <span class="n">ftdi</span><span class="p">,</span> <span class="n">adc</span>
 
 
 <span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -263,7 +264,7 @@
 <span class="sd">    :return: Starting index of a sweep data, header of that sweep</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">flag_valid_header</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">initial_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># index starts at 0</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">initial_index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
         <span class="n">current_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
         <span class="k">if</span> <span class="n">current_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span>
             <span class="s1">&#39;start&#39;</span><span class="p">]:</span>  <span class="c1"># Not 100% foolproof, but cannot be anyway</span>
@@ -276,12 +277,14 @@
     <span class="k">if</span> <span class="n">flag_valid_header</span><span class="p">:</span>  <span class="c1"># All good</span>
         <span class="n">index</span> <span class="o">+=</span> <span class="mi">2</span>  <span class="c1"># Skip the header, it is saved in current_header</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># No valid header was found</span>
-        <span class="n">current_header</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] No valid header found when searching for a start signal&quot;</span><span class="p">)</span>
+        <span class="c1"># index = -1  # No valid header was found</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_header</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="c1">#print(&quot;[ERROR] index: {} | len(data): {} | s[&#39;nbytes_sweep&#39;]: {}&quot;.format(index, len(data), s[&#39;nbytes_sweep&#39;]))</span>
         <span class="c1">#raise ValueError(&#39;[ERROR] No valid header found in the data!&#39;)</span>
 
+    <span class="k">assert</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">current_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">127</span> <span class="ow">or</span> <span class="n">current_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">return</span> <span class="n">index</span><span class="p">,</span> <span class="n">current_header</span></div>
 
 <div class="viewcode-block" id="process_batch"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.process_batch">[docs]</a><span class="k">def</span> <span class="nf">process_batch</span><span class="p">(</span><span class="n">rest</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">next_header</span><span class="p">,</span> <span class="n">counter_decimation</span><span class="p">,</span> <span class="n">sweep_count</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -299,12 +302,23 @@
 <span class="sd">    :param verbose: A lot of extra info will be displayed</span>
 <span class="sd">    :return: batch_ch, next_header, rest, sweep_count, counter_decimation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Sanity checks</span>
+    <span class="c1"># Sanity checks on types</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">rest</span><span class="p">)</span><span class="o">==</span><span class="nb">bytes</span> <span class="ow">or</span> <span class="n">rest</span> <span class="o">==</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">==</span><span class="nb">bytes</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span><span class="o">==</span><span class="nb">int</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">])</span><span class="o">==</span><span class="nb">int</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">next_header</span><span class="p">)</span><span class="o">==</span><span class="nb">list</span>
+
+    <span class="c1"># Sanity checks on length</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_header</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">rest</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="c1"># Sanity check on nature of next_header</span>
+    <span class="k">assert</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]]</span>  <span class="c1"># Can be the start signal or an error code</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rest</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rest</span><span class="p">))</span>
     <span class="c1"># 0. Create temp variables</span>
     <span class="c1">#counter_decimation = 0  # For software decimation</span>
     <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="mi">0</span>
@@ -317,41 +331,64 @@
 
     <span class="c1"># 1. Concatenate the rest with the data</span>
     <span class="n">initial_data_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># DEBUG</span>
-    <span class="k">if</span> <span class="n">rest</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">rest</span> <span class="o">+</span> <span class="n">data</span>  <span class="c1"># Concatenate the bytearrays</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">rest</span> <span class="o">+</span> <span class="n">data</span>  <span class="c1"># Concatenate the bytearrays</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;patience_data_length&#39;</span><span class="p">]:</span>  <span class="c1"># Threshold in data length</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;[ERROR] No valid header found in these </span><span class="si">{}</span><span class="s1"> byte of data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] rest length: </span><span class="si">{}</span><span class="s2"> | block: </span><span class="si">{}</span><span class="s2"> long | shape to process: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rest</span><span class="p">),</span> <span class="n">initial_data_length</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
 
     <span class="c1"># 2. Find the start</span>
-    <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Either no previous data or the previous frame did not end w/ valid header</span>
-        <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># The previous batch ended without a valid next header</span>
+    <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]:</span>  <span class="c1"># The start was not found</span>
+        <span class="c1"># This can happen if the previous sweep ended with a lot of data but no valid header.</span>
+        <span class="c1"># All the remaining data was carried over as rest. Once a new valid header is found, we can see how many</span>
+        <span class="c1"># sweeps were skipped and fill batch_ch with the corresponding amount of 0s. Should be rare to skip so many</span>
+        <span class="c1"># sweep unless very few bytes are read on the USB port.</span>
+
+        <span class="c1"># CASE 1: [0, 0] - No valid header ever found</span>
+        <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># This is the first time we go through process_batch</span>
+            <span class="n">index</span><span class="p">,</span> <span class="n">next_header</span> <span class="o">=</span> <span class="n">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># valid header not found - need more data to get started</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] No valid header found when searching for a start signal for a case [0, 0]&quot;</span><span class="p">)</span>
+                <span class="n">rest</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="k">return</span> <span class="n">batch_ch</span><span class="p">,</span> <span class="n">next_header</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">sweep_count</span><span class="p">,</span> <span class="n">counter_decimation</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Found a valid header. Let&#39;s get started with the main while loop!</span>
+                <span class="k">assert</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
+
+        <span class="c1"># CASE 2: [1, N] - The backward search failed previously</span>
+        <span class="k">elif</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># The previous batch ended without a valid next header but has a frame_number</span>
             <span class="n">current_frame_number</span> <span class="o">=</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">index</span><span class="p">,</span> <span class="n">next_header</span> <span class="o">=</span> <span class="n">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-            <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_frame_number</span><span class="p">)</span><span class="o">&amp;</span><span class="mh">0xff</span>
+            <span class="n">index</span><span class="p">,</span> <span class="n">next_header</span> <span class="o">=</span> <span class="n">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># Start searching from the start</span>
+            <span class="k">if</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># valid header not found - need more data to get started</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] No valid header found when searching for a start signal for a case [1, N]&quot;</span><span class="p">)</span>
+                <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">current_frame_number</span><span class="p">]</span>  <span class="c1"># Restore header</span>
+                <span class="n">rest</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="k">return</span> <span class="n">batch_ch</span><span class="p">,</span> <span class="n">next_header</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">sweep_count</span><span class="p">,</span> <span class="n">counter_decimation</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Sucess! A valid header was found. Append the required 0s for the skipped sweeps</span>
+                <span class="k">assert</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Recovered from backward search failure with&quot;</span><span class="p">,</span> <span class="n">next_header</span><span class="p">)</span>
+                <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_frame_number</span><span class="p">)</span><span class="o">&amp;</span><span class="mh">0xff</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sweeps_scanned</span><span class="p">):</span>  <span class="c1"># Add all the required zeros before getting started</span>
+                    <span class="k">if</span> <span class="n">counter_decimation</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;soft_decimate&#39;</span><span class="p">]:</span>
+                        <span class="n">signed_data</span> <span class="o">=</span> <span class="n">skipped_data</span>  <span class="c1"># Will append just 0s. Frame is skipped</span>
+                        <span class="n">batch_ch</span><span class="p">[</span><span class="s1">&#39;skipped_sweeps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep_count</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sweeps_scanned</span><span class="p">):</span>  <span class="c1"># Add all the required zeros before getting started</span>
-                <span class="k">if</span> <span class="n">counter_decimation</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;soft_decimate&#39;</span><span class="p">]:</span>
-                    <span class="n">signed_data</span> <span class="o">=</span> <span class="n">skipped_data</span>  <span class="c1"># Will append just 0s. Frame is skipped</span>
-                    <span class="n">batch_ch</span><span class="p">[</span><span class="s1">&#39;skipped_sweeps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep_count</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;channel_count&#39;</span><span class="p">]):</span>  <span class="c1"># Channels number are 1 based for now</span>
+                            <span class="n">batch_ch</span><span class="p">[</span><span class="n">channel</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signed_data</span><span class="p">[</span><span class="n">channel</span><span class="p">::</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;channel_count&#39;</span><span class="p">]])</span>  <span class="c1"># Data is entangled</span>
 
-                    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;channel_count&#39;</span><span class="p">]):</span>  <span class="c1"># Channels number are 1 based for now</span>
-                        <span class="n">batch_ch</span><span class="p">[</span><span class="n">channel</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signed_data</span><span class="p">[</span><span class="n">channel</span><span class="p">::</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;channel_count&#39;</span><span class="p">]])</span>  <span class="c1"># Data is entangled</span>
+                        <span class="c1"># Increment counters</span>
+                        <span class="n">counter_decimation</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">sweep_count</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Only count sweeps after decimation</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Decimate sweep: should we interpolate the data or drop zeros?</span>
+                        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Decimating sweep : </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">counter_decimation</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;soft_decimate&#39;</span><span class="p">]))</span>
+                        <span class="n">counter_decimation</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Done recovering &quot;</span><span class="p">,</span> <span class="n">next_header</span><span class="p">)</span>
 
-                    <span class="c1"># Increment counters</span>
-                    <span class="n">counter_decimation</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="n">sweep_count</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Only count sweeps after decimation</span>
-                <span class="k">else</span><span class="p">:</span>  <span class="c1"># Decimate sweep: should we interpolate the data or drop zeros?</span>
-                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Decimating sweep : </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">counter_decimation</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;soft_decimate&#39;</span><span class="p">]))</span>
-                    <span class="n">counter_decimation</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">index</span><span class="p">,</span> <span class="n">next_header</span> <span class="o">=</span> <span class="n">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_header</span><span class="p">)</span>  <span class="c1"># If false, means that no valid start found in the whole batch!</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># There is a valid previous header.</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># There is a valid previous header!</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># rest+data will be scanned from the start</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Starting with header&quot;</span><span class="p">,</span> <span class="n">next_header</span><span class="p">)</span>
@@ -364,12 +401,23 @@
 
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
-    <span class="c1"># 3. Process the batches</span>
-    <span class="k">while</span> <span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>  <span class="c1"># As long as we can scoop the next batch and header</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>  <span class="c1"># All issues must have been solved before getting to the main loop</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">next_header</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">assert</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span>  <span class="c1"># Cannot be negative otherwise creates a wreck</span>
+
+    <span class="c1"># 3. Process the batches as long as they are valid.</span>
+    <span class="k">while</span> <span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">and</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]:</span>
         <span class="c1"># 3.1 Scoop the next s[&#39;nbytes_sweep&#39;] and the following header</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[INFO] Reading sweep&quot;</span><span class="p">,</span> <span class="n">current_frame_number</span><span class="p">)</span>
         <span class="n">batch</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Debug 2&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">])</span>
+            <span class="k">raise</span>
         <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]],</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
 
         <span class="c1"># 3.2 First case: the header is valid</span>
@@ -391,19 +439,23 @@
 
             <span class="c1"># Option 1: Look for the start of the correct next_header in the dropped data</span>
             <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># Go in reverse</span>
-                <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="c1"># if sweep_data[jj] == s[&#39;start&#39;] and next_frame_number == (current_frame_number+1)&amp;0xff:  # I think this is wrong</span>
-                    <span class="k">if</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">current_frame_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">:</span>  <span class="c1"># Check this</span>
-                        <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-                        <span class="c1"># raise</span>
+                <span class="k">try</span><span class="p">:</span>  <span class="c1"># DEBUG</span>
+                    <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="c1"># if sweep_data[jj] == s[&#39;start&#39;] and next_frame_number == (current_frame_number+1)&amp;0xff:  # I think this is wrong</span>
+                        <span class="k">if</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">current_frame_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">&amp;</span><span class="mh">0xff</span><span class="p">:</span>  <span class="c1"># Check this</span>
+                            <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="c1"># Only 1 int16 was lost</span>
+                            <span class="k">break</span>
+
+                    <span class="k">elif</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">current_frame_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">&amp;</span><span class="mh">0xff</span><span class="p">:</span>
+                        <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>  <span class="c1"># Cast batch values to int and put them in a list</span>
                         <span class="k">break</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">next_header</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">elif</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">current_frame_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">:</span>
-                    <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="n">jj</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
-                    <span class="k">break</span>
-            <span class="c1"># Restart from that location</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_header</span><span class="p">):</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">jj</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">next_header</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="mi">0</span>
+            <span class="c1"># Process the result of that backward search</span>
+            <span class="k">if</span> <span class="n">next_header</span> <span class="o">==</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">current_frame_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">]:</span>  <span class="c1"># Valid header!</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] Found header </span><span class="si">{}</span><span class="s2"> at </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">next_header</span><span class="p">,</span> <span class="n">index</span><span class="o">+</span><span class="n">jj</span><span class="p">))</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] Skipping sweep </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">current_frame_number</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="o">+</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]))</span>
@@ -411,22 +463,27 @@
                 <span class="n">index</span> <span class="o">+=</span> <span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span> <span class="c1"># Skip the next_header and get ready to scoop s[&#39;nbytes_sweep&#39;] of data</span>
                 <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_frame_number</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span>
                 <span class="k">assert</span> <span class="n">sweeps_scanned</span> <span class="o">==</span> <span class="mi">1</span>  <span class="c1"># Debug</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Backward pass failed</span>
                 <span class="c1"># Option 2: Search for the header forward</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] Dropping sweep as the next header was not found in previous data.&quot;</span><span class="p">)</span>
-                <span class="n">index</span><span class="p">,</span> <span class="n">next_header</span> <span class="o">=</span> <span class="n">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">initial_index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] Current sweep number: </span><span class="si">{}</span><span class="s2"> | Next header count: </span><span class="si">{}</span><span class="s2">&quot;</span>
-                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">current_frame_number</span><span class="p">,</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="c1"># Failed to find a valid header</span>
-                    <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># No rest will be generated</span>
-                    <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_frame_number</span><span class="p">]</span>  <span class="c1"># Communicate</span>
-                    <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Skip channel assignement</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[ERROR] Next header not found in previous incorrect frame nor rest of frame.&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_frame_number</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span>  <span class="c1"># Could be &gt; 1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[WARNING] Failed backward search. Header must have been lost.&quot;</span><span class="p">)</span>
+                <span class="n">next_header</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">current_frame_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">]</span>  <span class="c1"># Signal that the backward search failed</span>
+                <span class="k">assert</span> <span class="n">jj</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;nbytes_sweep&#39;</span><span class="p">]</span>  <span class="c1"># Skip the whole &quot;expected&quot; sweep.</span>
+                <span class="n">sweeps_scanned</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># This sweep will be ignored</span>
+                <span class="sd">&quot;&quot;&quot;[TBR] Previously tried to find forward the next header</span>
+<span class="sd">                index, next_header = find_start_batch(data, s, initial_index=index)</span>
+<span class="sd">                print(&quot;[WARNING] Current sweep number: {} | Next header count: {}&quot;</span>
+<span class="sd">                      .format(current_frame_number, next_header[1]))</span>
 
-         <span class="c1"># 1 for the backward pass, &gt;= 1 for fwd</span>
+<span class="sd">                if next_header[0] == 0:  # Failed to find a valid header forward</span>
+<span class="sd">                    index = len(data)  # No rest will be generated</span>
+<span class="sd">                    next_header = [0, current_frame_number]  # Communicate</span>
+<span class="sd">                    sweeps_scanned = 0  # Skip channel assignement</span>
+<span class="sd">                    print(&#39;[WARNING] Next header not found in previous incorrect frame nor rest of frame.&#39;)</span>
+<span class="sd">                else:  # Valid header found in forward data</span>
+<span class="sd">                    sweeps_scanned = (next_header[1] - current_frame_number) &amp; 0xff  # Could be &gt; 1</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+
         <span class="n">current_frame_number</span> <span class="o">=</span> <span class="n">next_header</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Ready to read the next sweep</span>
 
         <span class="c1"># 3.3 Append data if we are not decimating</span>
@@ -456,7 +513,7 @@
     <span class="c1"># Return numpy arrays rather than lists</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;channel_count&#39;</span><span class="p">]):</span>
         <span class="n">batch_ch</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch_ch</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
-    <span class="n">rest</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">:]</span>  <span class="c1"># Get the rest</span>
+    <span class="n">rest</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">:]</span>  <span class="c1"># Get the rest if index &lt; length(data) else []</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[INFO] There is a rest of length&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rest</span><span class="p">))</span>
     
@@ -468,29 +525,27 @@
 <span class="sd">    Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.</span>
 <span class="sd">    :param sweeps: Sweeps to consider</span>
 <span class="sd">    :param s: Settings dictionary</span>
-<span class="sd">    :return: Voltage is returned as a dict with each key being a channel. clim is the max differential voltage.</span>
+<span class="sd">    :return: Voltage is returned as a dict with each key being a channel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">sweeps</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
     <span class="n">if_data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">clim</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;max_differential_voltage&#39;</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span> <span class="c1"># Go through all available channels</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sweeps</span><span class="p">[</span><span class="n">channel</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;fir_gain&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;adc_bits&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># No w</span>
         <span class="n">if_data</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
 
-    <span class="k">return</span> <span class="n">if_data</span><span class="p">,</span> <span class="n">clim</span></div>
+    <span class="k">return</span> <span class="n">if_data</span></div>
 
 
-<div class="viewcode-block" id="calculate_angle_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.calculate_angle_plot">[docs]</a><span class="k">def</span> <span class="nf">calculate_angle_plot</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">):</span>
+<div class="viewcode-block" id="calculate_angle_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.calculate_angle_plot">[docs]</a><span class="k">def</span> <span class="nf">calculate_angle_plot</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Perform the data processing to calculate the angular location of objects in a single sweep. The goal is to plot</span>
 <span class="sd">    that result afterward, not to process multiple sweeps.</span>
 
 <span class="sd">    :param sweeps: Data from which the angle position will be calculated</span>
 <span class="sd">    :param s: Settings dictionary</span>
-<span class="sd">    :param clim: Maximum value of the data. If None, it will be calculated</span>
 <span class="sd">    :param tfd_angles: Tuple containing all the bins important for the plotting</span>
-<span class="sd">    :return: fxdb, clim</span>
+<span class="sd">    :return: fxdb</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># WARNING: ONLY 2 CHANNELS SUPPORTED SO FAR</span>
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">sweeps</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
@@ -520,10 +575,13 @@
 
     <span class="n">fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;angle_pad&#39;</span><span class="p">]),</span> <span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">fx</span> <span class="o">=</span> <span class="n">r4_normalize</span><span class="p">(</span><span class="n">fx</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">clim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Calculate the min/max to use with the color bar</span>
         <span class="n">max_range_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;max_range&#39;</span><span class="p">])</span>
-        <span class="n">clim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">[:</span><span class="n">max_range_i</span><span class="p">,</span> <span class="p">:])))</span> <span class="o">+</span> <span class="mi">10</span>
-    <span class="k">if</span> <span class="n">fxm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cblim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">[:</span><span class="n">max_range_i</span><span class="p">,</span> <span class="p">:])))</span> <span class="o">+</span> <span class="mi">10</span>
+        <span class="n">cblim</span> <span class="o">=</span> <span class="p">[</span><span class="n">cblim</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="n">cblim</span><span class="p">]</span>  <span class="c1"># min max array</span>
+
+    <span class="k">if</span> <span class="n">fxm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Apply coefficients ?</span>
         <span class="n">fx</span> <span class="o">=</span> <span class="n">coefs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">fx</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># k is not defined anymore, would have to get it from original files</span>
         <span class="n">fx</span> <span class="o">+=</span> <span class="n">coefs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">fx</span>
@@ -542,7 +600,7 @@
     <span class="n">fxdb</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">))</span>
 
 
-    <span class="k">return</span> <span class="n">fxdb</span><span class="p">,</span> <span class="n">clim</span></div>
+    <span class="k">return</span> <span class="n">fxdb</span></div>
 
 
 <div class="viewcode-block" id="calculate_range_time"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.calculate_range_time">[docs]</a><span class="k">def</span> <span class="nf">calculate_range_time</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">single_sweep</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
@@ -553,7 +611,7 @@
 <span class="sd">    :param ch: dict containing the sweep data for each channel</span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :param single_sweep: Sweep to select in the dictionary in case there are actually multiple of them. To be removed.</span>
-<span class="sd">    :return: im, nb_sweeps, max_range_index, clim</span>
+<span class="sd">    :return: im, nb_sweeps, max_range_index</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># WARNING: ONLY USING CHANNEL 2 FOR THAT</span>
     <span class="c1"># Take the average of all channels</span>
@@ -590,7 +648,6 @@
 
     <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_range_index</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nb_sweeps</span><span class="p">))</span>
     <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">sweep_length</span> <span class="k">if</span> <span class="n">single_sweep</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">kaiser</span><span class="p">(</span><span class="n">sweep_length</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;kaiser_beta&#39;</span><span class="p">])</span>
-    <span class="n">clim</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_sweeps</span><span class="p">):</span>
         <span class="n">sw</span> <span class="o">=</span> <span class="n">sweeps</span> <span class="k">if</span> <span class="n">single_sweep</span> <span class="k">else</span> <span class="n">sweeps</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
@@ -603,12 +660,14 @@
         <span class="n">fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">sw</span><span class="p">)[</span><span class="mi">3</span><span class="p">:</span><span class="n">max_range_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># FFT of the sweep</span>
         <span class="n">fy</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;adc_ref&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;adc_bits&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;fir_gain&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_range_index</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fy</span><span class="p">))</span>
         <span class="n">fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">fy</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
-        <span class="n">clim</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">clim</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">fy</span><span class="p">))</span>  <span class="c1"># Track max value for fxdb</span>
         <span class="n">im</span><span class="p">[:,</span> <span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fy</span><span class="p">)</span>
-        <span class="c1">#im[:, e] = fy</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fy</span><span class="p">)</span> <span class="k">if</span> <span class="n">single_sweep</span> <span class="k">else</span> <span class="n">im</span>
 
-    <span class="k">return</span> <span class="n">im</span><span class="p">,</span> <span class="n">nb_sweeps</span><span class="p">,</span> <span class="n">max_range_index</span><span class="p">,</span> <span class="n">clim</span></div>
+    <span class="k">if</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cblim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">im</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+
+
+    <span class="k">return</span> <span class="n">im</span><span class="p">,</span> <span class="n">nb_sweeps</span><span class="p">,</span> <span class="n">max_range_index</span></div>
 
 
 <div class="viewcode-block" id="find_start"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.find_start">[docs]</a><span class="k">def</span> <span class="nf">find_start</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
@@ -1010,7 +1069,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span><span class="n">arr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;active_channels&#39;</span><span class="p">])}</span>  <span class="c1"># dict for compatibility</span>
 
             <span class="c1"># 4. Process the IF data</span>
-            <span class="n">if_data</span><span class="p">,</span> <span class="n">clim</span> <span class="o">=</span> <span class="n">calculate_if_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">if_data</span> <span class="o">=</span> <span class="n">calculate_if_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
 
             <span class="c1"># 5. Sanity checks: did we skip some refreshes for being too slow?</span>
             <span class="n">sweeps_skipped</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;refresh_stride&#39;</span><span class="p">]))</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1023,7 +1082,7 @@
                               <span class="n">sweeps_skipped</span><span class="p">))</span>
 
             <span class="c1"># 6. Update the figure</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">if_data</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">if_data</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">)</span>
 
             <span class="c1"># 7. Set the necessary counters and flags</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1055,7 +1114,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Voltage [V]&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;max_differential_voltage&#39;</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;max_differential_voltage&#39;</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_if&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>  <span class="c1"># Set the color bar limits if they have been defined. Otherwise, dynamic.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_if&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
         <span class="c1"># 3. Display initial data (zeros) to activate the figure</span>
@@ -1071,7 +1131,7 @@
             <span class="c1"># cache the background</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">axbackground</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">copy_from_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span>
 
-<div class="viewcode-block" id="if_time_domain_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.if_time_domain_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">if_data</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">clim</span><span class="p">):</span>
+<div class="viewcode-block" id="if_time_domain_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.if_time_domain_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">if_data</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dynamic refresh of the IF plot.</span>
 <span class="sd">        A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible</span>
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
@@ -1079,7 +1139,6 @@
 <span class="sd">        available to it on the screen.</span>
 <span class="sd">        :param if_data: processed IF data from a sweep</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
-<span class="sd">        :param clim: Maximum of the current data</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">if_data</span><span class="p">:</span>  <span class="c1"># Update y-data only, for all active channels</span>
@@ -1087,7 +1146,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;IF time-domain at time T = </span><span class="si">{:.3f}</span><span class="s1"> s | FPGA time: </span><span class="si">{:.1f}</span><span class="s1"> s (lag: </span><span class="si">{:.1f}</span><span class="s1"> s)&#39;</span>
                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># Update title</span>
-        <span class="c1"># clim is not used but could be used to relay the maximum</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blit</span><span class="p">:</span>  <span class="c1"># Given the performance boost, should be the default case</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">restore_region</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axbackground</span><span class="p">)</span>  <span class="c1"># restore background</span>
@@ -1155,8 +1213,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">arr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;active_channels&#39;</span><span class="p">])}</span>  <span class="c1"># dict for compatibility</span>
 
             <span class="c1"># 4. Process the data to determine the angular components</span>
-            <span class="n">clim</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># The maximum of a sweep will be automatically calculated</span>
-            <span class="n">fxdb</span><span class="p">,</span> <span class="n">clim</span> <span class="o">=</span> <span class="n">calculate_angle_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfd_angles</span><span class="p">)</span>
+            <span class="n">fxdb</span> <span class="o">=</span> <span class="n">calculate_angle_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfd_angles</span><span class="p">)</span>
 
             <span class="c1"># 5. Sanity checks: did we skip some refreshes for being too slow?</span>
             <span class="n">sweeps_skipped</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;refresh_stride&#39;</span><span class="p">]))</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1169,7 +1226,7 @@
                               <span class="n">sweeps_skipped</span><span class="p">))</span>
 
             <span class="c1"># 6. Update the figure</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">fxdb</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">clim</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">fxdb</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">)</span>
 
             <span class="c1"># 7. Set the necessary counters and flags</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1226,6 +1283,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;[ERROR] Incorrect method for the angle plots&#39;</span><span class="p">)</span>
 
+
         <span class="c1"># 3. Display initial data (zeros) to activate the figure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>  <span class="c1"># Get ready to cache this</span>
 
@@ -1246,8 +1304,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;[ERROR] Incorrect method for the angle plots&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">colorbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_angle&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>  <span class="c1"># Set the color bar limits if they have been defined. Otherwise, dynamic.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_angle&#39;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="angle_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.angle_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fxdb</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">clim</span><span class="p">):</span>
+<div class="viewcode-block" id="angle_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.angle_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fxdb</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dynamic refresh of the angular plot.</span>
 <span class="sd">        A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible</span>
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
@@ -1255,7 +1315,6 @@
 
 <span class="sd">        :param fxdb: Angular data to plot</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
-<span class="sd">        :param clim: Maximum of the current data</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1264,7 +1323,7 @@
         <span class="c1"># https://stackoverflow.com/questions/18797175/animation-with-pcolormesh-routine-in-matplotlib-how-do-i-initialize-the-data</span>
         <span class="c1"># https://stackoverflow.com/questions/29009743/using-set-array-with-pyplot-pcolormesh-ruins-figure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="n">fxdb</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="n">clim</span> <span class="o">-</span> <span class="mi">50</span><span class="p">,</span> <span class="n">clim</span><span class="p">)</span>  <span class="c1"># Updates the colorbar</span>
+        <span class="c1"># self.quad.set_clim(*cblim)  # Updates the colorbar</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Angle plot at time T = </span><span class="si">{:.3f}</span><span class="s1"> s | FPGA time: </span><span class="si">{:.1f}</span><span class="s1"> s (lag: </span><span class="si">{:.1f}</span><span class="s1"> s)&#39;</span>
                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -1336,7 +1395,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">arr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;active_channels&#39;</span><span class="p">])}</span>
 
             <span class="c1"># 4. Process the data to determine the angular components</span>
-            <span class="n">im</span><span class="p">,</span> <span class="n">nb_sweeps</span><span class="p">,</span> <span class="n">max_range_index</span><span class="p">,</span> <span class="n">clim</span> <span class="o">=</span> <span class="n">calculate_range_time</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">single_sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">im</span><span class="p">,</span> <span class="n">nb_sweeps</span><span class="p">,</span> <span class="n">max_range_index</span> <span class="o">=</span> <span class="n">calculate_range_time</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">single_sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
             <span class="c1"># 5. Sanity checks: did we skip some refreshes for being too slow?</span>
             <span class="n">sweeps_skipped</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;refresh_stride&#39;</span><span class="p">]))</span><span class="o">-</span><span class="mi">1</span>
@@ -1351,7 +1410,7 @@
                               <span class="n">sweeps_skipped</span><span class="p">))</span>
 
             <span class="c1"># 6. Update the figure</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">sweeps_skipped</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">update_plot</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">sweeps_skipped</span><span class="p">)</span>
 
             <span class="c1"># 7. Set the necessary counters and flags</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">previous_sweep_counter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1360,7 +1419,7 @@
             <span class="c1">#print(&quot;RT loop duration: mean: {:.3f} s | std: {:.3f} s&quot;.format(np.mean(self.timing), np.std(self.timing)))</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Range time is terminating&quot;</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Range time is terminating&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="range_time_animation"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_animation">[docs]</a><span class="k">class</span> <span class="nc">range_time_animation</span><span class="p">():</span>
@@ -1391,13 +1450,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">quad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_array</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">colorbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">)</span>
 
+
         <span class="c1"># 4. If blitting, cache background</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blit</span> <span class="o">=</span> <span class="n">blit</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blit</span><span class="p">:</span>
             <span class="c1"># cache the background</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">axbackground</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">copy_from_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span>
 
-<div class="viewcode-block" id="range_time_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">sweeps_skipped</span><span class="p">):</span>
+        <span class="c1">#self.quad.set_array(self.current_array[:-1, :-1].ravel())</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_range_time&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>  <span class="c1"># Set the color bar limits if they have been defined. Otherwise, dynamic.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;cblim_range_time&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="range_time_animation.update_plot"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_animation.update_plot">[docs]</a>    <span class="k">def</span> <span class="nf">update_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">,</span> <span class="n">sweeps_skipped</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dynamic refresh of the Range time plot</span>
 <span class="sd">        A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible</span>
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
@@ -1405,7 +1469,6 @@
 <span class="sd">        available to it on the screen.</span>
 <span class="sd">        :param im: range time data</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
-<span class="sd">        :param clim: Maximum of the current data</span>
 <span class="sd">        :param sweeps_skipped: Important here to duplicate the current sweep as many times as sweeps we skipped</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1418,7 +1481,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">current_array</span><span class="p">[:,</span> <span class="o">-</span><span class="n">sweeps_skipped</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span>  <span class="n">im</span> <span class="c1"># Substitute the new array &amp; pad</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_array</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>  <span class="c1"># Flatten the data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="n">clim</span> <span class="o">-</span> <span class="mi">80</span><span class="p">,</span> <span class="n">clim</span><span class="p">)</span>  <span class="c1"># Updates the colorbar</span>
+        <span class="c1"># self.quad.set_clim(*cblim)  # Updates the colorbar</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Range time plot at time T = </span><span class="si">{:.3f}</span><span class="s1"> s | FPGA time: </span><span class="si">{:.1f}</span><span class="s1"> s (lag: </span><span class="si">{:.1f}</span><span class="s1"> s)&#39;</span>
                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time_stamp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">time_stamp</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
