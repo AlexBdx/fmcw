@@ -10,6 +10,7 @@ from threading import Thread
 import csv
 import os
 import multiprocessing as mp
+from fmcw import ftdi, adc
 
 
 import matplotlib
@@ -131,11 +132,12 @@ def find_start_batch(data, s, initial_index=0):
         index += 2  # Skip the header, it is saved in current_header
     else:
         # index = -1  # No valid header was found
+        index = 0
         current_header = [0, 0]
         #print("[ERROR] index: {} | len(data): {} | s['nbytes_sweep']: {}".format(index, len(data), s['nbytes_sweep']))
         #raise ValueError('[ERROR] No valid header found in the data!')
 
-    assert index > 0
+    assert index >= 0
     assert current_header[0] == 127 or current_header[0] == 0
     return index, current_header
 
@@ -169,7 +171,6 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
     # Sanity check on nature of next_header
     assert next_header[0] in [0, 1, s['start']]  # Can be the start signal or an error code
 
-    # print(len(data), len(rest))
     if len(rest) > len(data):
         print(len(data), len(rest))
     # 0. Create temp variables

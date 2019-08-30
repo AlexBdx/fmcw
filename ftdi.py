@@ -15,7 +15,8 @@ class FPGA():
         """
         SYNCFF = 0x40
         SIO_RTS_CTS_HS = (0x1 << 8)
-        self.device = ftdi.Device(mode='t', interface_select=ftdi.INTERFACE_A, encoding=encoding)
+        #self.device = ftdi.Device(mode='t', interface_select=ftdi.INTERFACE_A, encoding=encoding)
+        self.device = ftdi.Device(mode='b', interface_select=ftdi.INTERFACE_A, encoding=encoding)
         #self.device.open()  # Not needed if not lazy open
         self.device.ftdi_fn.ftdi_set_bitmode(0xff, SYNCFF)
         self.device.ftdi_fn.ftdi_read_data_set_chunksize(0x10000)
