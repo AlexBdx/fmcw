@@ -2,7 +2,7 @@
 Based on initial & ongoing work by Henrik Forstén/[@Ttl](https://github.com/Ttl/).
 
 ## Generalities
-### Version conventions
+### Version convention
 Releases have a version number in the following format:
 X.YYY.ZZZ
 - X is the hardware version.
@@ -36,7 +36,7 @@ Congratulations! There are two main options:
 1. You write your own script based on the library. This is expected to be hard as the documentation is lagging behind the code I write.
 2. You reuse the latest release I have for the main script. This is the recommended option.
 
-In what follows, I will describe how I use the library based on the script uploaded with release 3.1.ZZZ
+In what follows, I will describe how I use the library with 190830\_rt\_fmcw3.py, uploaded with release 3.1.ZZZ.
 
 
 ## Description of the flow
