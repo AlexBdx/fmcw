@@ -4,7 +4,17 @@ import time
 import os
 
 class fpga_reader(mp.Process):
+    """
+    This class describes the object that will read the FPGA. By inheriting from Process, it can be launched as a
+    subprocess.
+    """
     def __init__(self, connection, s):
+        """
+        Nothing too fancy here. Note that initially all the ftdi initialization was done here but the generated object
+        cannot be pickled. Therefore, I moved it to the run function.
+        :param connection: the end of a Pipe
+        :param s: settings dictionary
+        """
         mp.Process.__init__(self)  # Calling super constructor - mandatory
         self.connection = connection
         self.s = s
@@ -16,6 +26,10 @@ class fpga_reader(mp.Process):
         self.connection.send(process_info)
 
     def run(self):
+        """
+        Main routine polling the USB bus. It is not perfect, but >95% of the frames are valid with this configuration.
+        :return: void
+        """
         self.adf4158 = adc.ADF4158()
 
         self.fpga = ftdi.FPGA(self.adf4158, encoding=self.s['encoding'])

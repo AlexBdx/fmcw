@@ -794,19 +794,19 @@ class Writer(Thread):
         self.encoding = encoding  # type of writer
         self.wrote = 0  # Number of byte or lines written
 
-        # Initialize the settings file and write the settings to file with csv.DictWriter
-        with open(s['path_settings'], 'w') as f:  # Write the settings to file
-            writer = csv.DictWriter(f, fieldnames=s.keys())
-            writer.writeheader()
-            writer.writerow(s)
-        print("[INFO] Wrote the settings to {}".format(s['path_settings']))
-
         if self.encoding == 'latin1':
             self.f = open(s['path_raw_log'], 'w', encoding=self.encoding)
         elif self.encoding == 'csv':
             self.f = open(s['path_csv_log'], 'w')
             self.writer = csv.writer(self.f)
             self.writer.writerow(['Timestamp', 'Sweep number', 'Channel', 'Data'])  # Add a header
+        elif self.encoding == 'settings':
+            # Initialize the settings file and write the settings to file with csv.DictWriter
+            with open(s['path_settings'], 'w') as f:  # Write the settings to file
+                writer = csv.DictWriter(f, fieldnames=s.keys())
+                writer.writeheader()
+                writer.writerow(s)
+            print("[INFO] Wrote the settings to {}".format(s['path_settings']))
         else:
             raise ValueError('[ERROR] File encoding method {} unknown'.format(self.encoding))
         self.timeout = s['timeout']

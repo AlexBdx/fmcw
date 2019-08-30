@@ -30,14 +30,6 @@ fmcw.ftdi module
     :undoc-members:
     :show-inheritance:
 
-fmcw.postprocessing module
---------------------------
-
-.. automodule:: fmcw.postprocessing
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 fmcw.preprocessing module
 --------------------------
 
@@ -46,6 +38,13 @@ fmcw.preprocessing module
     :undoc-members:
     :show-inheritance:
 
+fmcw.postprocessing module
+--------------------------
+
+.. automodule:: fmcw.postprocessing
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

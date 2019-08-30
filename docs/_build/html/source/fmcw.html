@@ -87,8 +87,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-fmcw.adc">fmcw.adc module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-fmcw.display">fmcw.display module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-fmcw.ftdi">fmcw.ftdi module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-fmcw.postprocessing">fmcw.postprocessing module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-fmcw.preprocessing">fmcw.preprocessing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-fmcw.postprocessing">fmcw.postprocessing module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-fmcw">Module contents</a></li>
 </ul>
 </li>
@@ -435,6 +435,21 @@ Legacy Writer thread used to write to the binary log file</p>
 invokes the callable object passed to the object’s constructor as the
 target argument, if any, with sequential and keyword arguments taken
 from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fmcw.preprocessing">
+<span id="fmcw-preprocessing-module"></span><h2>fmcw.preprocessing module<a class="headerlink" href="#module-fmcw.preprocessing" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fmcw.preprocessing.fpga_reader">
+<em class="property">class </em><code class="descclassname">fmcw.preprocessing.</code><code class="descname">fpga_reader</code><span class="sig-paren">(</span><em>connection</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/preprocessing.html#fpga_reader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.preprocessing.fpga_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.context.Process</span></code></p>
+<dl class="method">
+<dt id="fmcw.preprocessing.fpga_reader.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/preprocessing.html#fpga_reader.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.preprocessing.fpga_reader.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to be run in sub-process; can be overridden in sub-class</p>
 </dd></dl>
 
 </dd></dl>
@@ -788,21 +803,6 @@ goal is to perform motion detection a lot more easily.
 :param val: Bytes to complement
 :param bits:
 :return: 2’s complement of int value val</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-fmcw.preprocessing">
-<span id="fmcw-preprocessing-module"></span><h2>fmcw.preprocessing module<a class="headerlink" href="#module-fmcw.preprocessing" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fmcw.preprocessing.fpga_reader">
-<em class="property">class </em><code class="descclassname">fmcw.preprocessing.</code><code class="descname">fpga_reader</code><span class="sig-paren">(</span><em>connection</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/preprocessing.html#fpga_reader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.preprocessing.fpga_reader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.context.Process</span></code></p>
-<dl class="method">
-<dt id="fmcw.preprocessing.fpga_reader.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fmcw/preprocessing.html#fpga_reader.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fmcw.preprocessing.fpga_reader.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to be run in sub-process; can be overridden in sub-class</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
