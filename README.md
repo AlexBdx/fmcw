@@ -1,5 +1,6 @@
 # FMCW
 Based on initial & ongoing work by Henrik Forstén/[@Ttl](https://github.com/Ttl/).
+Documentation in progress at [Read The Docs](https://fmcw.readthedocs.io/en/latest/)
 
 ## Generalities
 ### Version convention
@@ -10,15 +11,15 @@ X.YYY.ZZZ
 - ZZZ is the minor update version
 
 ### History
-The FMCW package is a library designed to interact at a high level with the fmcw radar from Henrik Forstén/[@Ttl](https://github.com/Ttl/). If you are not familiar with it, take a look at Henrik's latest blog post first:
-[Version 3](http://hforsten.com/third-version-of-homemade-6-ghz-fmcw-radar.html)
+The FMCW package is a library designed to interact at a high level with the fmcw radar from Henrik Forstén/[@Ttl](https://github.com/Ttl/). If you are not familiar with it, start with taking a look at Henrik's blog post on the third version of the radar:
+[FMCW 3](http://hforsten.com/third-version-of-homemade-6-ghz-fmcw-radar.html)
 
 For additional information on this type of radar, you can also take a look at the previous blog posts written by Henrik. These older radars are not be compatible with this library but can help shine some light on radar theory and the history of the project:
-[Version 1](http://hforsten.com/6-ghz-frequency-modulated-radar.html)
-[Version 2](http://hforsten.com/homemade-synthetic-aperture-radar.html)
+- [FMCW 1](http://hforsten.com/6-ghz-frequency-modulated-radar.html)
+- [FMCW 2](http://hforsten.com/homemade-synthetic-aperture-radar.html)
 
-Additionnaly, Henrik's fmcw project was covered in a few articles. For instance,
-[Hackaday coverage](https://hackaday.com/2017/10/11/homemade-6ghz-radar-v3/)
+Additionnaly, Henrik's fmcw project was covered in a few articles. For instance:
+- [Hackaday coverage](https://hackaday.com/2017/10/11/homemade-6ghz-radar-v3/)
 
 ### Where to get an fmcw3?
 Short answer: you have to make it yourself.
@@ -36,7 +37,7 @@ Congratulations! There are two main options:
 1. You write your own script based on the library. This is expected to be hard as the documentation is lagging behind the code I write.
 2. You reuse the latest release I have for the main script. This is the recommended option.
 
-In what follows, I will describe how I use the library with 190830\_rt\_fmcw3.py, uploaded with release 3.1.ZZZ.
+In what follows, I will describe how I use the library with **190830\_rt\_fmcw3.py**, uploaded with release 3.1.ZZZ.
 
 
 ## Description of the flow
