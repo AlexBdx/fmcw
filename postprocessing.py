@@ -14,7 +14,7 @@ from fmcw import ftdi, adc
 
 
 import matplotlib
-#matplotlib.use('TkAgg')  # Use another backend
+matplotlib.use('Qt5Agg')  # Use another backend
 import matplotlib.pyplot as plt
 plt.ion()
 
@@ -1273,7 +1273,7 @@ class range_time_display(mp.Process):
             #print("RT loop duration: mean: {:.3f} s | std: {:.3f} s".format(np.mean(self.timing), np.std(self.timing)))
 
     def __del__(self):
-        print("[INFO] Range time is terminating")
+        print("[INFO] Range time is now terminating")
 
 
 class range_time_animation():

@@ -8,7 +8,7 @@ class fpga_reader(mp.Process):
     This class describes the object that will read the FPGA. By inheriting from Process, it can be launched as a
     subprocess.
     """
-    def __init__(self, connection, s):
+    def __init__(self, flag_reading_data, connection, s):
         """
         Nothing too fancy here. Note that initially all the ftdi initialization was done here but the generated object
         cannot be pickled. Therefore, I moved it to the run function.
@@ -24,6 +24,7 @@ class fpga_reader(mp.Process):
             'pid': os.getpid()
         }
         self.connection.send(process_info)
+        self.flag_reading_data = flag_reading_data  # Indicates to everyone that the FPGA is being read.
 
     def run(self):
         """
@@ -32,7 +33,12 @@ class fpga_reader(mp.Process):
         """
         self.adf4158 = adc.ADF4158()
 
-        self.fpga = ftdi.FPGA(self.adf4158, encoding=self.s['encoding'])
+        try:
+            self.fpga = ftdi.FPGA(self.adf4158, encoding=self.s['encoding'])
+        except Exception as e:
+            print("[ERROR]", e)
+            return
+
         self.fpga.set_gpio(led=True, adf_ce=True)
         self.fpga.set_adc(oe2=True)
         self.fpga.clear_adc(oe1=True, shdn1=True, shdn2=True)
@@ -48,9 +54,12 @@ class fpga_reader(mp.Process):
         self.fpga.set_channels(a=self.s[1], b=self.s[2])  # Would not scale up
 
         # Run while nothing is put to the pipe - it is an "almost" read only pipe
+        self.flag_reading_data.set()  # To maximize accuracy, this is set just before entering the while loop
         while True:
             self.connection.send_bytes(self.fpga.device.read(self.s['byte_usb_read']//self.s['sub_call']))
 
+    def close(self):
+        self.flag_reading_data.clear()  # First thing done after the terminate call from parent process
         # Close properly the fpga device
         self.fpga.set_adc(oe1=True, shdn1=True, shdn2=True)
         self.fpga.set_channels(a=False, b=False)
