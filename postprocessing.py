@@ -15,6 +15,7 @@ from fmcw import ftdi, adc
 
 import matplotlib
 matplotlib.use('Qt5Agg')  # Use another backend
+matplotlib.rc('image', cmap='jet')
 import matplotlib.pyplot as plt
 plt.ion()
 

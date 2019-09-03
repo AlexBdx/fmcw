@@ -152,6 +152,7 @@ def plot_range_time(t, im, s, time_stamp=''):
     plt.title('Overall Range-time plot for '+time_stamp[:-1])
     imgplot = plt.pcolormesh(x, y, im)
     imgplot.set_clim(*s['cblim_range_time'])
+    print("[INFO] cblim used", s['cblim_range_time'])
     plt.colorbar()
 
     if matplotlib.get_backend() == 'Qt5Agg':
