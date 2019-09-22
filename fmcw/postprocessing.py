@@ -22,7 +22,8 @@ plt.ion()
 
 def butter_highpass(cutoff, fs, order=4):
     """
-    User friendly wrapper for a highpass scipy.signal.butter
+    User friendly wrapper for a highpass scipy.signal.butter.
+    
     :param cutoff: cutoff frequency
     :param fs: sampling frequency
     :param order: order of the Butterworth filter
@@ -36,7 +37,8 @@ def butter_highpass(cutoff, fs, order=4):
 
 def butter_highpass_filter(data, cutoff, fs, order=4):
     """
-    Filter data with a highpass scipy.signal.butter
+    Filter data with a highpass scipy.signal.butter.
+    
     :param data: Data to filter
     :param cutoff: Cutoff frequency
     :param fs: Sampling frequency
@@ -50,7 +52,8 @@ def butter_highpass_filter(data, cutoff, fs, order=4):
 
 def twos_comp(val, bits):
     """
-    Compute the 2's complement of int value val
+    Compute the 2's complement of int value val.
+    
     :param val: Bytes to complement
     :param bits:
     :return: 2's complement of int value val
@@ -62,7 +65,8 @@ def twos_comp(val, bits):
 
 def f_to_d(f, s):
     """
-    Converts frequency bins to distance bins based on ADC settings
+    Converts frequency bins to distance bins based on ADC settings.
+    
     :param f: Frequency bins
     :param s: Settings dictionary
     :return: Distance bins
@@ -71,8 +75,8 @@ def f_to_d(f, s):
 
 def create_bases(s):
     """
-    Create the x axis data for all sorts of plots. This will speed up the display of the plots by caching it and
-    limiting the amount of data to be redrawn.
+    Create the x axis data for all sorts of plots. This will speed up the display of the plots by caching it and limiting the amount of data to be redrawn.
+    
     :param s: Settings dictionary
     :return: time, frequency, distance, angle bins
     """
@@ -86,7 +90,8 @@ def create_bases(s):
 
 def r4_normalize(x, d, e=1.5):
     """
-    Not sure what this does. Used when processing the angle data
+    Not sure what this does. Used when processing the angle data.
+    
     :param x:
     :param d:
     :param e:
@@ -98,8 +103,8 @@ def r4_normalize(x, d, e=1.5):
 
 def read_settings(f, encoding=None):
     """
-    Reads the first line of a file and evaluates it as python code. Used when reading the binary log as the first line
-    contains the settings dictionary.
+    Reads the first line of a file and evaluates it as python code. Used when reading the binary log as the first line contains the settings dictionary.
+    
     :param f: File handle
     :param encoding:
     :return: Settings dictionary from string evaluated as python code
@@ -113,7 +118,8 @@ def read_settings(f, encoding=None):
 def find_start_batch(data, s, initial_index=0):
     """
     Find the starting index of the first valid batch of sweep data and its corresponding header.
-    :param data: Batch of data coming from the FPGA via the USB port
+    :param data: Batch of data coming from the FPGA via the USB port.
+    
     :param s: Settings dictionary
     :param initial_index: 0 if reading a new batch, non zero if finding the next valid sweep within a batch
     :return: Starting index of a sweep data, header of that sweep
@@ -144,10 +150,8 @@ def find_start_batch(data, s, initial_index=0):
 
 def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, verbose=False):
     """
-    Main function to process incoming batches of data from the FPGA. The goal is to find valid sweeps in the data. Main 
-    challenges are that the start of the data might come from the end of a previous sweep, there might be some dropped 
-    byte in some sweeps due to latency from the OS vs real time FPGA, and a last sweep that is incomplete and has to be 
-    merged with the next batch.
+    Main function to process incoming batches of data from the FPGA. The goal is to find valid sweeps in the data. Main challenges are that the start of the data might come from the end of a previous sweep, there might be some dropped byte in some sweeps due to latency from the OS vs real time FPGA, and a last sweep that is incomplete and has to be merged with the next batch.
+    
     :param rest: End of the previous batch that was not long enough to constitute a whole sweep.
     :param data: New batch of USB data from the FPGA
     :param s: Settings dictionary
@@ -378,6 +382,7 @@ def process_batch(rest, data, s, next_header, counter_decimation, sweep_count, v
 def calculate_if_data(sweeps, s):
     """
     Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.
+    
     :param sweeps: Sweeps to consider
     :param s: Settings dictionary
     :return: Voltage is returned as a dict with each key being a channel.
@@ -463,6 +468,7 @@ def calculate_range_time(ch, s, single_sweep=-1):
     Take a single sweep and calculate the distances of all signals. All the channels are averaged in a single virtual
     channel. While this is not super good practice, it is mostly okay given how far the objects are in comparison to the
     distance between antennas.
+    
     :param ch: dict containing the sweep data for each channel
     :param s: Settings dictionary
     :param single_sweep: Sweep to select in the dictionary in case there are actually multiple of them. To be removed.
@@ -530,6 +536,7 @@ def find_start(f, start, s):
     Find a valid start header in a binary file by looking for two valid headers separated by the proper length of data.
     Given the simplicity of the system, it is not possible to guarantee that this data is "legit" as valid headers could
     be coming from random data. However, it is very unlikely.
+    
     :param f: File handle
     :param start: Start signal to look for
     :param s: Settings dictionary
@@ -567,6 +574,7 @@ def import_data(f, start, first_frame, s, samples, verbose=False):
     """
     Import the data from a binary file. This was the source inspiration for process_batch, which is more up to date and
     deal with real time data. As a result, this might not be fully up to date.
+    
     :param f: File handle
     :param start: Start signal for the headers
     :param first_frame: Get the current frame number read from find_start
@@ -680,6 +688,7 @@ def import_data(f, start, first_frame, s, samples, verbose=False):
 def compare_ndarrays(a, b):
     """Check if two arrays are equivalent or not with additional details
     Helper function written to find quickly why two arrays are not equal element wise.
+    
     :param a: Array 1
     :param b: Array 2
     :return: Void. An exception is raised if a difference between the two arrays have been found.
@@ -708,6 +717,7 @@ def subtract_background(channel_data, w, data):
     """DEPRECATED?
     Subtract the mean to a list of sweeps and multiply the result by the weights w. One thing to note, is that sweeps
     full of zeros (coming from corrupted usb data) are left invariant.
+    
     :param channel_data: dict of channels containing the sweep data as numpy arrays
     :param w: weights to apply to the array of sweeps
     :param data: Not sure
@@ -727,6 +737,7 @@ def subtract_clutter(channel_data, w, data, clutter_averaging=1):
     """DEPRECATED?
     Subtract to a sweep the average of the previous clutter_averaging sweeps. It's some kind of moving average. The
     goal is to perform motion detection a lot more easily.
+    
     :param channel_data: dict of channels containing the sweep data as numpy arrays
     :param w: weights to apply to the array of sweeps
     :param data: Not sure
@@ -816,7 +827,8 @@ class Writer(Thread):
     def run(self):
         """
         Process the data from the queue and write it to file.
-        :return:
+        
+        :return: void
         """
         while True:
             try:
@@ -847,7 +859,8 @@ def move_figure(f, number):
     """Move a figure to position (x, y) of the screen determined by the figure "number". Only 3 positions supported.
     DO NOT REALY ON THIS FUNCTION. CANNOT BE GENERALIZED TO OTHER USE CASES THAN WHAT IT WAS DESIGNED FOR.
     Basically, only used it with Qt5Agg. Did not try other backends and the code is not complete for it. They are slower
-    than Qt when I tried, so not relevant. All units are px
+    than Qt when I tried, so not relevant. All units are px.
+    
     :param f: Figure handle
     :param number: Figure number. Only handles 3 different positions on screen, all 3 horizontal.
     :return: Void
@@ -881,6 +894,7 @@ class if_display(mp.Process):
     def __init__(self, tfd_angles, s, data_accessible, new_sweep_if, sweep_to_display, time_stamp):
         """
         Nothing too special here. Store a bunch of information.
+        
         :param tfd_angles: x axis data
         :param s: Settings dictionary
         :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.
@@ -953,6 +967,7 @@ class if_time_domain_animation():
     def __init__(self, tfd_angles, s, grid=False, blit=False):
         """
         Initialize an object that will contain the IF plot.
+        
         :param tfd_angles:
         :param s: Settings dictionary
         :param grid: Display the grid on the plot screen.
@@ -992,6 +1007,7 @@ class if_time_domain_animation():
         improvements, especially by messing with the backend directly.
         TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels
         available to it on the screen.
+        
         :param if_data: processed IF data from a sweep
         :param time_stamp: Timestamp for the current sweep
         :return:
@@ -1026,6 +1042,7 @@ class angle_display(mp.Process):
     def __init__(self, tfd_angles, s, data_accessible, new_sweep_angle, sweep_to_display, time_stamp):
         """
         Nothing too special here. Store a bunch of information.
+        
         :param tfd_angles: x axis data
         :param s: Settings dictionary
         :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.
@@ -1046,7 +1063,8 @@ class angle_display(mp.Process):
 
     def run(self):
         """
-        Angle sub-process loop
+        Angle sub-process loop.
+        
         :return:
         """
         # Create the figure object. Does not work when done in __init__ for some reason
@@ -1096,7 +1114,8 @@ class angle_display(mp.Process):
 class angle_animation():
     def __init__(self, tfd_angles, s, method='angle', blit=False):
         """
-        Initialize an object that will contain the Angle plot
+        Initialize an object that will contain the Angle plot.
+        
         :param tfd_angles:
         :param s: Settings dictionary
         :param method: Various types of angular plots are available
@@ -1166,7 +1185,7 @@ class angle_animation():
         """Dynamic refresh of the angular plot.
         A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible
         improvements, especially by messing with the backend directly.
-        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels
+        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels.
 
         :param fxdb: Angular data to plot
         :param time_stamp: Timestamp for the current sweep
@@ -1205,6 +1224,7 @@ class range_time_display(mp.Process):
     def __init__(self, tfd_angles, s, data_accessible, new_sweep_range_time, sweep_to_display, time_stamp):
         """
         Nothing too special here. Store a bunch of information.
+        
         :param tfd_angles: x axis data
         :param s: Settings dictionary
         :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.
@@ -1228,7 +1248,8 @@ class range_time_display(mp.Process):
 
     def run(self):
         """
-        Range time sub-process loop
+        Range time sub-process loop.
+        
         :return:
         """
         # Create the figure object. Does not work when done in __init__ for some reason
@@ -1280,7 +1301,8 @@ class range_time_display(mp.Process):
 class range_time_animation():
     def __init__(self, s, max_range_index, blit=False):
         """
-        Initialize an object that will contain the Range Time plot
+        Initialize an object that will contain the Range Time plot.
+        
         :param tfd_angles:
         :param s: Settings dictionary
         :param max_range_index: Maximum index used to display the requested range (or max dictated but Fourier)
@@ -1322,6 +1344,7 @@ class range_time_animation():
         improvements, especially by messing with the backend directly.
         TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels
         available to it on the screen.
+        
         :param im: range time data
         :param time_stamp: Timestamp for the current sweep
         :param sweeps_skipped: Important here to duplicate the current sweep as many times as sweeps we skipped
