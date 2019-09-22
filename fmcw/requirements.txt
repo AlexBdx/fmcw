@@ -1,2 +1,0 @@
-fmcw>=0.3.0
-pylibftdi>=0.17.0
