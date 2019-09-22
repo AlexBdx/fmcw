@@ -231,7 +231,7 @@ def main():
 
 
 """------------------------------------------------------------------------------------------------------------------"""
-"""I. Parameters setup"""npt
+"""I. Parameters setup"""
 # I.1. Command line arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--duration", type=int, default=20, help="duration of the recording [s]")
