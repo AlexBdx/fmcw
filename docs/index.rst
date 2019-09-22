@@ -11,6 +11,8 @@ Welcome to fmcw's documentation!
 This library provides high level access to the FMCW3 radar. It provides the necessary building blocks to automatically handle configuration of the FPGA, reception of the data and post-processing. 
 With reasonable settings, most users should even be able to be able to display a few plots in real time.
 
+If you have any questions, feel free to join the fmcwworkspace slack.
+
 Table Of Contents:
 ==================
 
@@ -18,6 +20,7 @@ Table Of Contents:
    :maxdepth: 2
    :caption: Contents:
 
+   source/history
    source/fmcw
 
 
