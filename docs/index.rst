@@ -6,9 +6,10 @@
 Welcome to fmcw's documentation!
 ================================
 
-/!\ PAGE STILL UNDER CONSTRUCTION /!\
+/!\ DOCUMENTATION STILL UNDER CONSTRUCTION /!\
 
-This library provides high level access to the FMCW3 radar. It provides the necessary building blocks to automatically handle configuration of the FPGA, reception of the data and post-processing of it. With reasonable settings, most users should even be able to be able to display a few plots in real time.
+This library provides high level access to the FMCW3 radar. It provides the necessary building blocks to automatically handle configuration of the FPGA, reception of the data and post-processing. 
+With reasonable settings, most users should even be able to be able to display a few plots in real time.
 
 Table Of Contents:
 ==================
@@ -17,7 +18,7 @@ Table Of Contents:
    :maxdepth: 2
    :caption: Contents:
 
-   source/modules
+   source/fmcw
 
 
 

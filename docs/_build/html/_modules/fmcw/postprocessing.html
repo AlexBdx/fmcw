@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/fmcw.html">fmcw package</a></li>
 </ul>
 
             
@@ -172,7 +172,8 @@
 
 <div class="viewcode-block" id="butter_highpass"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.butter_highpass">[docs]</a><span class="k">def</span> <span class="nf">butter_highpass</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    User friendly wrapper for a highpass scipy.signal.butter</span>
+<span class="sd">    User friendly wrapper for a highpass scipy.signal.butter.</span>
+<span class="sd">    </span>
 <span class="sd">    :param cutoff: cutoff frequency</span>
 <span class="sd">    :param fs: sampling frequency</span>
 <span class="sd">    :param order: order of the Butterworth filter</span>
@@ -186,7 +187,8 @@
 
 <div class="viewcode-block" id="butter_highpass_filter"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.butter_highpass_filter">[docs]</a><span class="k">def</span> <span class="nf">butter_highpass_filter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter data with a highpass scipy.signal.butter</span>
+<span class="sd">    Filter data with a highpass scipy.signal.butter.</span>
+<span class="sd">    </span>
 <span class="sd">    :param data: Data to filter</span>
 <span class="sd">    :param cutoff: Cutoff frequency</span>
 <span class="sd">    :param fs: Sampling frequency</span>
@@ -200,7 +202,8 @@
 
 <div class="viewcode-block" id="twos_comp"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.twos_comp">[docs]</a><span class="k">def</span> <span class="nf">twos_comp</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the 2&#39;s complement of int value val</span>
+<span class="sd">    Compute the 2&#39;s complement of int value val.</span>
+<span class="sd">    </span>
 <span class="sd">    :param val: Bytes to complement</span>
 <span class="sd">    :param bits:</span>
 <span class="sd">    :return: 2&#39;s complement of int value val</span>
@@ -212,7 +215,8 @@
 
 <div class="viewcode-block" id="f_to_d"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.f_to_d">[docs]</a><span class="k">def</span> <span class="nf">f_to_d</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts frequency bins to distance bins based on ADC settings</span>
+<span class="sd">    Converts frequency bins to distance bins based on ADC settings.</span>
+<span class="sd">    </span>
 <span class="sd">    :param f: Frequency bins</span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :return: Distance bins</span>
@@ -221,8 +225,8 @@
 
 <div class="viewcode-block" id="create_bases"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.create_bases">[docs]</a><span class="k">def</span> <span class="nf">create_bases</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create the x axis data for all sorts of plots. This will speed up the display of the plots by caching it and</span>
-<span class="sd">    limiting the amount of data to be redrawn.</span>
+<span class="sd">    Create the x axis data for all sorts of plots. This will speed up the display of the plots by caching it and limiting the amount of data to be redrawn.</span>
+<span class="sd">    </span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :return: time, frequency, distance, angle bins</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -236,7 +240,8 @@
 
 <div class="viewcode-block" id="r4_normalize"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.r4_normalize">[docs]</a><span class="k">def</span> <span class="nf">r4_normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mf">1.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Not sure what this does. Used when processing the angle data</span>
+<span class="sd">    Not sure what this does. Used when processing the angle data.</span>
+<span class="sd">    </span>
 <span class="sd">    :param x:</span>
 <span class="sd">    :param d:</span>
 <span class="sd">    :param e:</span>
@@ -248,8 +253,8 @@
 
 <div class="viewcode-block" id="read_settings"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.read_settings">[docs]</a><span class="k">def</span> <span class="nf">read_settings</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Reads the first line of a file and evaluates it as python code. Used when reading the binary log as the first line</span>
-<span class="sd">    contains the settings dictionary.</span>
+<span class="sd">    Reads the first line of a file and evaluates it as python code. Used when reading the binary log as the first line contains the settings dictionary.</span>
+<span class="sd">    </span>
 <span class="sd">    :param f: File handle</span>
 <span class="sd">    :param encoding:</span>
 <span class="sd">    :return: Settings dictionary from string evaluated as python code</span>
@@ -263,7 +268,8 @@
 <div class="viewcode-block" id="find_start_batch"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.find_start_batch">[docs]</a><span class="k">def</span> <span class="nf">find_start_batch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">initial_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the starting index of the first valid batch of sweep data and its corresponding header.</span>
-<span class="sd">    :param data: Batch of data coming from the FPGA via the USB port</span>
+<span class="sd">    :param data: Batch of data coming from the FPGA via the USB port.</span>
+<span class="sd">    </span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :param initial_index: 0 if reading a new batch, non zero if finding the next valid sweep within a batch</span>
 <span class="sd">    :return: Starting index of a sweep data, header of that sweep</span>
@@ -294,10 +300,8 @@
 
 <div class="viewcode-block" id="process_batch"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.process_batch">[docs]</a><span class="k">def</span> <span class="nf">process_batch</span><span class="p">(</span><span class="n">rest</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">next_header</span><span class="p">,</span> <span class="n">counter_decimation</span><span class="p">,</span> <span class="n">sweep_count</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main function to process incoming batches of data from the FPGA. The goal is to find valid sweeps in the data. Main </span>
-<span class="sd">    challenges are that the start of the data might come from the end of a previous sweep, there might be some dropped </span>
-<span class="sd">    byte in some sweeps due to latency from the OS vs real time FPGA, and a last sweep that is incomplete and has to be </span>
-<span class="sd">    merged with the next batch.</span>
+<span class="sd">    Main function to process incoming batches of data from the FPGA. The goal is to find valid sweeps in the data. Main challenges are that the start of the data might come from the end of a previous sweep, there might be some dropped byte in some sweeps due to latency from the OS vs real time FPGA, and a last sweep that is incomplete and has to be merged with the next batch.</span>
+<span class="sd">    </span>
 <span class="sd">    :param rest: End of the previous batch that was not long enough to constitute a whole sweep.</span>
 <span class="sd">    :param data: New batch of USB data from the FPGA</span>
 <span class="sd">    :param s: Settings dictionary</span>
@@ -528,6 +532,7 @@
 <div class="viewcode-block" id="calculate_if_data"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.calculate_if_data">[docs]</a><span class="k">def</span> <span class="nf">calculate_if_data</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert the raw data to a differential voltage level. Note that the data is cast from int16 to float64.</span>
+<span class="sd">    </span>
 <span class="sd">    :param sweeps: Sweeps to consider</span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :return: Voltage is returned as a dict with each key being a channel.</span>
@@ -613,6 +618,7 @@
 <span class="sd">    Take a single sweep and calculate the distances of all signals. All the channels are averaged in a single virtual</span>
 <span class="sd">    channel. While this is not super good practice, it is mostly okay given how far the objects are in comparison to the</span>
 <span class="sd">    distance between antennas.</span>
+<span class="sd">    </span>
 <span class="sd">    :param ch: dict containing the sweep data for each channel</span>
 <span class="sd">    :param s: Settings dictionary</span>
 <span class="sd">    :param single_sweep: Sweep to select in the dictionary in case there are actually multiple of them. To be removed.</span>
@@ -680,11 +686,11 @@
 <span class="sd">    Find a valid start header in a binary file by looking for two valid headers separated by the proper length of data.</span>
 <span class="sd">    Given the simplicity of the system, it is not possible to guarantee that this data is &quot;legit&quot; as valid headers could</span>
 <span class="sd">    be coming from random data. However, it is very unlikely.</span>
+<span class="sd">    </span>
 <span class="sd">    :param f: File handle</span>
 <span class="sd">    :param start: Start signal to look for</span>
 <span class="sd">    :param s: Settings dictionary</span>
-<span class="sd">    :return: The current file.seek() index at which the valid data starts and the corresponding frame number. It is</span>
-<span class="sd">    coded on a single byte, so expect it to roll over after 255 is reached.</span>
+<span class="sd">    :return: The current file.seek() index at which the valid data starts and the corresponding frame number. It is coded on a single byte, so expect it to roll over after 255 is reached.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
@@ -717,6 +723,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Import the data from a binary file. This was the source inspiration for process_batch, which is more up to date and</span>
 <span class="sd">    deal with real time data. As a result, this might not be fully up to date.</span>
+<span class="sd">    </span>
 <span class="sd">    :param f: File handle</span>
 <span class="sd">    :param start: Start signal for the headers</span>
 <span class="sd">    :param first_frame: Get the current frame number read from find_start</span>
@@ -830,6 +837,7 @@
 <div class="viewcode-block" id="compare_ndarrays"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.compare_ndarrays">[docs]</a><span class="k">def</span> <span class="nf">compare_ndarrays</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if two arrays are equivalent or not with additional details</span>
 <span class="sd">    Helper function written to find quickly why two arrays are not equal element wise.</span>
+<span class="sd">    </span>
 <span class="sd">    :param a: Array 1</span>
 <span class="sd">    :param b: Array 2</span>
 <span class="sd">    :return: Void. An exception is raised if a difference between the two arrays have been found.</span>
@@ -858,6 +866,7 @@
     <span class="sd">&quot;&quot;&quot;DEPRECATED?</span>
 <span class="sd">    Subtract the mean to a list of sweeps and multiply the result by the weights w. One thing to note, is that sweeps</span>
 <span class="sd">    full of zeros (coming from corrupted usb data) are left invariant.</span>
+<span class="sd">    </span>
 <span class="sd">    :param channel_data: dict of channels containing the sweep data as numpy arrays</span>
 <span class="sd">    :param w: weights to apply to the array of sweeps</span>
 <span class="sd">    :param data: Not sure</span>
@@ -877,6 +886,7 @@
     <span class="sd">&quot;&quot;&quot;DEPRECATED?</span>
 <span class="sd">    Subtract to a sweep the average of the previous clutter_averaging sweeps. It&#39;s some kind of moving average. The</span>
 <span class="sd">    goal is to perform motion detection a lot more easily.</span>
+<span class="sd">    </span>
 <span class="sd">    :param channel_data: dict of channels containing the sweep data as numpy arrays</span>
 <span class="sd">    :param w: weights to apply to the array of sweeps</span>
 <span class="sd">    :param data: Not sure</span>
@@ -966,7 +976,8 @@
 <div class="viewcode-block" id="Writer.run"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.Writer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process the data from the queue and write it to file.</span>
-<span class="sd">        :return:</span>
+<span class="sd">        </span>
+<span class="sd">        :return: void</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -997,7 +1008,8 @@
     <span class="sd">&quot;&quot;&quot;Move a figure to position (x, y) of the screen determined by the figure &quot;number&quot;. Only 3 positions supported.</span>
 <span class="sd">    DO NOT REALY ON THIS FUNCTION. CANNOT BE GENERALIZED TO OTHER USE CASES THAN WHAT IT WAS DESIGNED FOR.</span>
 <span class="sd">    Basically, only used it with Qt5Agg. Did not try other backends and the code is not complete for it. They are slower</span>
-<span class="sd">    than Qt when I tried, so not relevant. All units are px</span>
+<span class="sd">    than Qt when I tried, so not relevant. All units are px.</span>
+<span class="sd">    </span>
 <span class="sd">    :param f: Figure handle</span>
 <span class="sd">    :param number: Figure number. Only handles 3 different positions on screen, all 3 horizontal.</span>
 <span class="sd">    :return: Void</span>
@@ -1031,6 +1043,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">data_accessible</span><span class="p">,</span> <span class="n">new_sweep_if</span><span class="p">,</span> <span class="n">sweep_to_display</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nothing too special here. Store a bunch of information.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles: x axis data</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.</span>
@@ -1103,6 +1116,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize an object that will contain the IF plot.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles:</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param grid: Display the grid on the plot screen.</span>
@@ -1142,6 +1156,7 @@
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
 <span class="sd">        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels</span>
 <span class="sd">        available to it on the screen.</span>
+<span class="sd">        </span>
 <span class="sd">        :param if_data: processed IF data from a sweep</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
 <span class="sd">        :return:</span>
@@ -1176,6 +1191,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">data_accessible</span><span class="p">,</span> <span class="n">new_sweep_angle</span><span class="p">,</span> <span class="n">sweep_to_display</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nothing too special here. Store a bunch of information.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles: x axis data</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.</span>
@@ -1196,7 +1212,8 @@
 
 <div class="viewcode-block" id="angle_display.run"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.angle_display.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Angle sub-process loop</span>
+<span class="sd">        Angle sub-process loop.</span>
+<span class="sd">        </span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create the figure object. Does not work when done in __init__ for some reason</span>
@@ -1246,7 +1263,8 @@
 <div class="viewcode-block" id="angle_animation"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.angle_animation">[docs]</a><span class="k">class</span> <span class="nc">angle_animation</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize an object that will contain the Angle plot</span>
+<span class="sd">        Initialize an object that will contain the Angle plot.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles:</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param method: Various types of angular plots are available</span>
@@ -1316,7 +1334,7 @@
         <span class="sd">&quot;&quot;&quot;Dynamic refresh of the angular plot.</span>
 <span class="sd">        A lot of work has been put in reducing the time necessary to refresh a plot. There must be some possible</span>
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
-<span class="sd">        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels</span>
+<span class="sd">        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels.</span>
 
 <span class="sd">        :param fxdb: Angular data to plot</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
@@ -1355,6 +1373,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfd_angles</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">data_accessible</span><span class="p">,</span> <span class="n">new_sweep_range_time</span><span class="p">,</span> <span class="n">sweep_to_display</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nothing too special here. Store a bunch of information.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles: x axis data</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param data_accessible: shared mp.Event that acts as a Lock when the sweep data is being updated.</span>
@@ -1378,7 +1397,8 @@
 
 <div class="viewcode-block" id="range_time_display.run"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_display.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Range time sub-process loop</span>
+<span class="sd">        Range time sub-process loop.</span>
+<span class="sd">        </span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create the figure object. Does not work when done in __init__ for some reason</span>
@@ -1430,7 +1450,8 @@
 <div class="viewcode-block" id="range_time_animation"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_animation">[docs]</a><span class="k">class</span> <span class="nc">range_time_animation</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">max_range_index</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize an object that will contain the Range Time plot</span>
+<span class="sd">        Initialize an object that will contain the Range Time plot.</span>
+<span class="sd">        </span>
 <span class="sd">        :param tfd_angles:</span>
 <span class="sd">        :param s: Settings dictionary</span>
 <span class="sd">        :param max_range_index: Maximum index used to display the requested range (or max dictated but Fourier)</span>
@@ -1472,6 +1493,7 @@
 <span class="sd">        improvements, especially by messing with the backend directly.</span>
 <span class="sd">        TO DO: less data points could be plotted as an entire sweep is likely to contain more points than pixels</span>
 <span class="sd">        available to it on the screen.</span>
+<span class="sd">        </span>
 <span class="sd">        :param im: range time data</span>
 <span class="sd">        :param time_stamp: Timestamp for the current sweep</span>
 <span class="sd">        :param sweeps_skipped: Important here to duplicate the current sweep as many times as sweeps we skipped</span>

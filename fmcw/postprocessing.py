@@ -540,8 +540,7 @@ def find_start(f, start, s):
     :param f: File handle
     :param start: Start signal to look for
     :param s: Settings dictionary
-    :return: The current file.seek() index at which the valid data starts and the corresponding frame number. It is
-    coded on a single byte, so expect it to roll over after 255 is reached.
+    :return: The current file.seek() index at which the valid data starts and the corresponding frame number. It is coded on a single byte, so expect it to roll over after 255 is reached.
     """
     done = False
     while not done:

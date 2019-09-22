@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/fmcw.html">fmcw package</a></li>
 </ul>
 
             
@@ -154,6 +154,9 @@
 
 <div class="viewcode-block" id="ADF4158"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158">[docs]</a><span class="k">class</span> <span class="nc">ADF4158</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the registers expected for this ADC.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#Register definitions:</span>
         <span class="c1"># (Register: name: (First bit, Length, [value]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_def</span> <span class="o">=</span> <span class="p">{</span>
@@ -191,6 +194,16 @@
                 <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ADF4158.freq_to_regs"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.freq_to_regs">[docs]</a>    <span class="k">def</span> <span class="nf">freq_to_regs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fstart</span><span class="p">,</span> <span class="n">fpd_freq</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the ADC.</span>
+
+<span class="sd">        :param fstart: Initial chirp frequency?</span>
+<span class="sd">        :param fpd_freq:</span>
+<span class="sd">        :param bw: [Hz] bandwidth</span>
+<span class="sd">        :param length:</span>
+<span class="sd">        :param delay: Delay to account for the start of the mixer.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">rdiv2</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fstart</span><span class="o">/</span><span class="n">fpd_freq</span><span class="p">)</span>
@@ -279,7 +292,12 @@
         <span class="k">return</span> <span class="n">real_delay</span></div>
 
 <div class="viewcode-block" id="ADF4158.find_reg"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.find_reg">[docs]</a>    <span class="k">def</span> <span class="nf">find_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Finds register by name&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds register by name.</span>
+
+<span class="sd">        :param reg:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#for key, val in self.register_def.iteritems():</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_def</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -287,7 +305,12 @@
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ADF4158.write_value"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.adc.ADF4158.write_value">[docs]</a>    <span class="k">def</span> <span class="nf">write_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Write value to register, doesn&#39;t update the device&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write value to register, doesn&#39;t update the device.</span>
+
+<span class="sd">        :param kw:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#for reg, val in kw.iteritems():</span>
         <span class="k">for</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1">#print &quot;{} = {}&quot;.format(reg, val)</span>

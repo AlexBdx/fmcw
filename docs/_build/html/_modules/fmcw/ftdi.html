@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/fmcw.html">fmcw package</a></li>
 </ul>
 
             
@@ -181,7 +181,8 @@
 
 <div class="viewcode-block" id="FPGA.close"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Close the FTDI object</span>
+<span class="sd">        Close the FTDI object.</span>
+<span class="sd">        </span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -190,6 +191,7 @@
 <div class="viewcode-block" id="FPGA.send_packet"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.send_packet">[docs]</a>    <span class="k">def</span> <span class="nf">send_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a header to a packet, encode it and write to FTDI.</span>
+<span class="sd">        </span>
 <span class="sd">        :param x: data</span>
 <span class="sd">        :param cmd: type of packet</span>
 <span class="sd">        :return: write to FTDI</span>
@@ -209,6 +211,7 @@
 <div class="viewcode-block" id="FPGA.clear_gpio"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.clear_gpio">[docs]</a>    <span class="k">def</span> <span class="nf">clear_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">led</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pa_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mix_enbl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">adf_ce</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet signaling the GPIO pins to clear on the FPGA.</span>
+<span class="sd">        </span>
 <span class="sd">        :param led: Clear the LED</span>
 <span class="sd">        :param pa_off: Clear pa_off</span>
 <span class="sd">        :param mix_enbl: Disable mixer</span>
@@ -229,6 +232,7 @@
 <div class="viewcode-block" id="FPGA.set_gpio"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.set_gpio">[docs]</a>    <span class="k">def</span> <span class="nf">set_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">led</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pa_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mix_enbl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">adf_ce</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet signaling the GPIO pins to set on the FPGA.</span>
+<span class="sd">        </span>
 <span class="sd">        :param led: Set the LED</span>
 <span class="sd">        :param pa_off: Set the pa_off</span>
 <span class="sd">        :param mix_enbl: Enable the mixer</span>
@@ -249,6 +253,7 @@
 <div class="viewcode-block" id="FPGA.clear_adc"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.clear_adc">[docs]</a>    <span class="k">def</span> <span class="nf">clear_adc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oe1</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">oe2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shdn1</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shdn2</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet signaling the ADC pins to clear on the FPGA.</span>
+<span class="sd">        </span>
 <span class="sd">        :param oe1: Clear Output Enable 1</span>
 <span class="sd">        :param oe2: Clear Output Enable 2</span>
 <span class="sd">        :param shdn1: Clear Shutdown 1</span>
@@ -269,6 +274,7 @@
 <div class="viewcode-block" id="FPGA.set_adc"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.set_adc">[docs]</a>    <span class="k">def</span> <span class="nf">set_adc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oe1</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">oe2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shdn1</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shdn2</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet signaling the ADC pins to set on the FPGA.</span>
+<span class="sd">        </span>
 <span class="sd">        :param oe1: Set Output Enable 1</span>
 <span class="sd">        :param oe2: Set Output Enable 2</span>
 <span class="sd">        :param shdn1: Set Shutdown 1</span>
@@ -289,6 +295,7 @@
 <div class="viewcode-block" id="FPGA.write_pll_reg"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_pll_reg">[docs]</a>    <span class="k">def</span> <span class="nf">write_pll_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet to configure a PLL register.</span>
+<span class="sd">        </span>
 <span class="sd">        :param n: Configuration parameter</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -299,6 +306,7 @@
 <div class="viewcode-block" id="FPGA.write_pll"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_pll">[docs]</a>    <span class="k">def</span> <span class="nf">write_pll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Call for the configuration of all the registers.</span>
+<span class="sd">        </span>
 <span class="sd">        :return: void</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write_pll_reg</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
@@ -316,6 +324,7 @@
 <div class="viewcode-block" id="FPGA.set_sweep"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.set_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">set_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fstart</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set sweep parameters.</span>
+<span class="sd">        </span>
 <span class="sd">        :param fstart: [Hz] Start frequency of the chirp</span>
 <span class="sd">        :param bw: [Hz] Bandwidth to use</span>
 <span class="sd">        :param length: [s] Duration of the sweep</span>
@@ -328,7 +337,8 @@
 
 <div class="viewcode-block" id="FPGA.write_sweep_timer"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_sweep_timer">[docs]</a>    <span class="k">def</span> <span class="nf">write_sweep_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert the duration of the sweep to a number of ADC clock cycles</span>
+<span class="sd">        Convert the duration of the sweep to a number of ADC clock cycles.</span>
+<span class="sd">        </span>
 <span class="sd">        :param length: number of clock cycles that represent the duration of a sweep</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -338,7 +348,8 @@
 
 <div class="viewcode-block" id="FPGA.write_sweep_delay"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_sweep_delay">[docs]</a>    <span class="k">def</span> <span class="nf">write_sweep_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert the duration between two sweeps (sweep delay) to a number of ADC clock cycles</span>
+<span class="sd">        Convert the duration between two sweeps (sweep delay) to a number of ADC clock cycles.</span>
+<span class="sd">        </span>
 <span class="sd">        :param length: number of clock cycles that represent the duration between two sweeps</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -348,7 +359,8 @@
 
 <div class="viewcode-block" id="FPGA.set_channels"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.set_channels">[docs]</a>    <span class="k">def</span> <span class="nf">set_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;WARNING: ONLY 2 CHANNELS SUPPORTED</span>
-<span class="sd">        Set the channels to be activated (only two supported)</span>
+<span class="sd">        Set the channels to be activated (only two supported).</span>
+<span class="sd">        </span>
 <span class="sd">        :param a: State of channel a</span>
 <span class="sd">        :param b: State of channel b</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
@@ -363,6 +375,7 @@
 <div class="viewcode-block" id="FPGA.set_downsampler"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.set_downsampler">[docs]</a>    <span class="k">def</span> <span class="nf">set_downsampler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;WARNING: THE FPGA CODE REQUIRES IT TO BE ENABLED. TO DO: ALLOW THE USER TO DEACTIVATE IT</span>
 <span class="sd">        Set the downsampler.</span>
+<span class="sd">        </span>
 <span class="sd">        :param enable: Turn it on</span>
 <span class="sd">        :param quarter: Divide the sampling rate by another factor of 2</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
@@ -377,6 +390,7 @@
 <div class="viewcode-block" id="FPGA.write_decimate"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_decimate">[docs]</a>    <span class="k">def</span> <span class="nf">write_decimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decimate</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a packet to configure the decimation factor at the FPGA level.</span>
+<span class="sd">        </span>
 <span class="sd">        :param decimate: Number of sweeps to skip. 0 means no sweeps are skipped.</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -396,7 +410,8 @@
 
 <div class="viewcode-block" id="FPGA.write_pa_off_timer"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.write_pa_off_timer">[docs]</a>    <span class="k">def</span> <span class="nf">write_pa_off_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert the duration pa_off_timer to a number of ADC clock cycles</span>
+<span class="sd">        Convert the duration pa_off_timer to a number of ADC clock cycles.</span>
+<span class="sd">        </span>
 <span class="sd">        :param length: number of clock cycles that represent the pa_off_timer</span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -406,7 +421,8 @@
 
 <div class="viewcode-block" id="FPGA.clear_buffer"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.FPGA.clear_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">clear_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clear some buffer</span>
+<span class="sd">        Clear some buffer.</span>
+<span class="sd">        </span>
 <span class="sd">        :return: Packet to be encapsulated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_packet</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span></div></div>
@@ -414,7 +430,8 @@
 
 <div class="viewcode-block" id="Writer"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.ftdi.Writer">[docs]</a><span class="k">class</span> <span class="nc">Writer</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;DEPRECATED</span>
-<span class="sd">    Legacy Writer thread used to write to the binary log file</span>
+<span class="sd">    Legacy Writer thread used to write to the binary log file.</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin1&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="n">Thread</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>

@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/fmcw.html">fmcw package</a></li>
 </ul>
 
             
@@ -158,6 +158,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag_camera_ready</span><span class="p">,</span> <span class="n">flag_reading_data</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a few flags to sync the camera with the rest of the processes.</span>
+<span class="sd">        </span>
 <span class="sd">        :param flag_camera_ready:</span>
 <span class="sd">        :param flag_reading_data:</span>
 <span class="sd">        :param s:</span>
@@ -175,6 +176,7 @@
 <span class="sd">        import cv2 will start displaying the feed with Qt5 (my default), which then appears to be &quot;taken&quot; for all the</span>
 <span class="sd">        other plots being display. Therefore, the next backend is used for the other plots - TkAgg - and my package</span>
 <span class="sd">        was not written to support something else than TkAgg.</span>
+<span class="sd">        </span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#import cv2  # Gettho but I have not there seems to be conflicts with matplotlib if outside local scope.</span>
@@ -222,12 +224,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
         <span class="n">destroyAllWindows</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Camera process is now terminating.&quot;</span><span class="p">)</span></div></div>
-
-
-
-
-
-
 </pre></div>
 
            </div>

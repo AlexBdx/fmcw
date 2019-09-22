@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">fmcw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/fmcw.html">fmcw package</a></li>
 </ul>
 
             
@@ -162,6 +162,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nothing too fancy here. Note that initially all the ftdi initialization was done here but the generated object</span>
 <span class="sd">        cannot be pickled. Therefore, I moved it to the run function.</span>
+<span class="sd">        </span>
 <span class="sd">        :param connection: the end of a Pipe</span>
 <span class="sd">        :param s: settings dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -179,6 +180,7 @@
 <div class="viewcode-block" id="fpga_reader.run"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.preprocessing.fpga_reader.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Main routine polling the USB bus. It is not perfect, but &gt;95% of the frames are valid with this configuration.</span>
+<span class="sd">        </span>
 <span class="sd">        :return: void</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">adf4158</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">ADF4158</span><span class="p">()</span>
