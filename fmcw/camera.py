@@ -3,8 +3,7 @@ import time
 
 class camera(mp.Process):
     """
-    This class describes the object that will read the camera as a separate subprocess. The start/stop is regulated by
-    an Event object.
+    This class describes the object that will read the camera as a separate subprocess. The start/stop is regulated by an Event object.
     """
     def __init__(self, flag_camera_ready, flag_reading_data, s):
 

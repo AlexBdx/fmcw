@@ -160,7 +160,8 @@
 
 
 <span class="kn">import</span> <span class="nn">matplotlib</span>
-<span class="c1">#matplotlib.use(&#39;TkAgg&#39;)  # Use another backend</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Qt5Agg&#39;</span><span class="p">)</span>  <span class="c1"># Use another backend</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
 
@@ -940,19 +941,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span>  <span class="c1"># type of writer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wrote</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Number of byte or lines written</span>
 
-        <span class="c1"># Initialize the settings file and write the settings to file with csv.DictWriter</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_settings&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># Write the settings to file</span>
-            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Wrote the settings to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_settings&#39;</span><span class="p">]))</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;latin1&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_raw_log&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_csv_log&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;Timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;Sweep number&#39;</span><span class="p">,</span> <span class="s1">&#39;Channel&#39;</span><span class="p">,</span> <span class="s1">&#39;Data&#39;</span><span class="p">])</span>  <span class="c1"># Add a header</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="s1">&#39;settings&#39;</span><span class="p">:</span>
+            <span class="c1"># Initialize the settings file and write the settings to file with csv.DictWriter</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_settings&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># Write the settings to file</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Wrote the settings to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;path_settings&#39;</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;[ERROR] File encoding method </span><span class="si">{}</span><span class="s1"> unknown&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span>
@@ -1419,7 +1420,7 @@
             <span class="c1">#print(&quot;RT loop duration: mean: {:.3f} s | std: {:.3f} s&quot;.format(np.mean(self.timing), np.std(self.timing)))</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Range time is terminating&quot;</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Range time is now terminating&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="range_time_animation"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.postprocessing.range_time_animation">[docs]</a><span class="k">class</span> <span class="nc">range_time_animation</span><span class="p">():</span>

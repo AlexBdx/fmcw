@@ -150,7 +150,17 @@
 <span class="kn">import</span> <span class="nn">os</span>
 
 <div class="viewcode-block" id="fpga_reader"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.preprocessing.fpga_reader">[docs]</a><span class="k">class</span> <span class="nc">fpga_reader</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class describes the object that will read the FPGA. By inheriting from Process, it can be launched as a</span>
+<span class="sd">    subprocess.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag_reading_data</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nothing too fancy here. Note that initially all the ftdi initialization was done here but the generated object</span>
+<span class="sd">        cannot be pickled. Therefore, I moved it to the run function.</span>
+<span class="sd">        :param connection: the end of a Pipe</span>
+<span class="sd">        :param s: settings dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Calling super constructor - mandatory</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
@@ -160,11 +170,21 @@
             <span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">process_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag_reading_data</span> <span class="o">=</span> <span class="n">flag_reading_data</span>  <span class="c1"># Indicates to everyone that the FPGA is being read.</span>
 
 <div class="viewcode-block" id="fpga_reader.run"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.preprocessing.fpga_reader.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main routine polling the USB bus. It is not perfect, but &gt;95% of the frames are valid with this configuration.</span>
+<span class="sd">        :return: void</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">adf4158</span> <span class="o">=</span> <span class="n">adc</span><span class="o">.</span><span class="n">ADF4158</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span> <span class="o">=</span> <span class="n">ftdi</span><span class="o">.</span><span class="n">FPGA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adf4158</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span> <span class="o">=</span> <span class="n">ftdi</span><span class="o">.</span><span class="n">FPGA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adf4158</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[ERROR]&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">set_gpio</span><span class="p">(</span><span class="n">led</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">adf_ce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">set_adc</span><span class="p">(</span><span class="n">oe2</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">clear_adc</span><span class="p">(</span><span class="n">oe1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shdn1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shdn2</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -180,9 +200,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># Would not scale up</span>
 
         <span class="c1"># Run while nothing is put to the pipe - it is an &quot;almost&quot; read only pipe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag_reading_data</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>  <span class="c1"># To maximize accuracy, this is set just before entering the while loop</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">send_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;byte_usb_read&#39;</span><span class="p">]</span><span class="o">//</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;sub_call&#39;</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">send_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;byte_usb_read&#39;</span><span class="p">]</span><span class="o">//</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;sub_call&#39;</span><span class="p">]))</span></div>
 
+<div class="viewcode-block" id="fpga_reader.close"><a class="viewcode-back" href="../../source/fmcw.html#fmcw.preprocessing.fpga_reader.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag_reading_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># First thing done after the terminate call from parent process</span>
         <span class="c1"># Close properly the fpga device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">set_adc</span><span class="p">(</span><span class="n">oe1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shdn1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shdn2</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fpga</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
