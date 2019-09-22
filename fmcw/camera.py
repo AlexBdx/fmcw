@@ -6,6 +6,12 @@ class camera(mp.Process):
     This class describes the object that will read the camera as a separate subprocess. The start/stop is regulated by an Event object.
     """
     def __init__(self, flag_camera_ready, flag_reading_data, s):
+        """
+        Initialize a few flags to sync the camera with the rest of the processes.
+        :param flag_camera_ready:
+        :param flag_reading_data:
+        :param s:
+        """
 
         mp.Process.__init__(self)  # Calling super constructor - mandatory
         self.s = s
@@ -14,6 +20,13 @@ class camera(mp.Process):
         self.frame_buffer = []
 
     def run(self):
+        """
+        Yes, importing all these modules from within a function is gettho, but I have not found a way around it yet.
+        import cv2 will start displaying the feed with Qt5 (my default), which then appears to be "taken" for all the
+        other plots being display. Therefore, the next backend is used for the other plots - TkAgg - and my package
+        was not written to support something else than TkAgg.
+        :return:
+        """
         #import cv2  # Gettho but I have not there seems to be conflicts with matplotlib if outside local scope.
         from cv2 import imshow, VideoCapture, flip, waitKey, destroyAllWindows, VideoWriter, VideoWriter_fourcc
         # Create the camera object
