@@ -46,6 +46,14 @@ fmcw.postprocessing module
     :undoc-members:
     :show-inheritance:
 
+fmcw.camera module
+--------------------------
+
+.. automodule:: fmcw.camera
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Module contents
 ---------------
 
