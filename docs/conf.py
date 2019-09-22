@@ -14,9 +14,9 @@
 #
 import os
 import sys
-#sys.path.insert(0, os.path.abspath('.'))
-#sys.path.insert(0, os.path.abspath('../fmcw'))  # This only: did not work on RTD despite working locally. Error is: WARNING: autodoc: failed to import module 'adc' from module 'fmcw'; the following exception was raised: No module named 'fmcw.adc'; 'fmcw' is not a package
-sys.path.insert(0, os.path.abspath('../'))  # This only: did not work on RTD despite working locally. Error is: failed to import module 'adc' from module 'fmcw'; the following exception was raised: No module named 'fmcw'
+sys.path.insert(0, os.path.abspath('.'))
+#sys.path.insert(0, os.path.abspath('../fmcw'))
+sys.path.insert(0, os.path.abspath('../'))
 
 
 
@@ -27,7 +27,7 @@ copyright = '2019, Alexandre Bondoux'
 author = 'Alexandre Bondoux'
 
 # The short X.Y version
-version = ''
+version = '3.1.0'
 # The full version, including alpha/beta/rc tags
 release = ''
 
