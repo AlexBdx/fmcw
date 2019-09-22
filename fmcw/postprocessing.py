@@ -14,10 +14,10 @@ from fmcw import ftdi, adc
 
 
 import matplotlib
-matplotlib.use('Qt5Agg')  # Use another backend
+#matplotlib.use('Qt5Agg')  # Use another backend
 matplotlib.rc('image', cmap='jet')
 import matplotlib.pyplot as plt
-plt.ion()
+#plt.ion()
 
 
 def butter_highpass(cutoff, fs, order=4):
