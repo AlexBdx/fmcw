@@ -4,6 +4,9 @@ from math import ceil, log
 
 class ADF4158():
     def __init__(self):
+        """
+        Define the registers expected for this ADC.
+        """
         #Register definitions:
         # (Register: name: (First bit, Length, [value]))
         self.register_def = {
@@ -41,6 +44,16 @@ class ADF4158():
                 keys.append(r)
 
     def freq_to_regs(self, fstart, fpd_freq, bw, length, delay):
+        """
+        Set up the ADC.
+
+        :param fstart: Initial chirp frequency?
+        :param fpd_freq:
+        :param bw: [Hz] bandwidth
+        :param length:
+        :param delay: Delay to account for the start of the mixer.
+        :return:
+        """
         self.write_value(rdiv2=1)
 
         n = int(fstart/fpd_freq)
@@ -129,7 +142,12 @@ class ADF4158():
         return real_delay
 
     def find_reg(self, reg):
-        """Finds register by name"""
+        """
+        Finds register by name.
+
+        :param reg:
+        :return:
+        """
         #for key, val in self.register_def.iteritems():
         for key, val in self.register_def.items():
             if reg in val.keys():
@@ -137,7 +155,12 @@ class ADF4158():
         return None, None
 
     def write_value(self, **kw):
-        """Write value to register, doesn't update the device"""
+        """
+        Write value to register, doesn't update the device.
+
+        :param kw:
+        :return:
+        """
         #for reg, val in kw.iteritems():
         for reg, val in kw.items():
             #print "{} = {}".format(reg, val)

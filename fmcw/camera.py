@@ -8,6 +8,7 @@ class camera(mp.Process):
     def __init__(self, flag_camera_ready, flag_reading_data, s):
         """
         Initialize a few flags to sync the camera with the rest of the processes.
+        
         :param flag_camera_ready:
         :param flag_reading_data:
         :param s:
@@ -25,6 +26,7 @@ class camera(mp.Process):
         import cv2 will start displaying the feed with Qt5 (my default), which then appears to be "taken" for all the
         other plots being display. Therefore, the next backend is used for the other plots - TkAgg - and my package
         was not written to support something else than TkAgg.
+        
         :return:
         """
         #import cv2  # Gettho but I have not there seems to be conflicts with matplotlib if outside local scope.
@@ -72,9 +74,3 @@ class camera(mp.Process):
         self.out.release()
         destroyAllWindows()
         print("[INFO] Camera process is now terminating.")
-
-
-
-
-
-

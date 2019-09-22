@@ -9,7 +9,8 @@ import csv
 
 def plot_if_spectrum(d, ch, sweep_number, w, fir_gain, adc_bits, time_stamp, show_plot=False):
     """TO DO: NEEDS AN UPDATE TO REDUCE THE ARGUMENT COUNT VIA THE USE OF THE SETTINGS DICTIONARY
-    Plot the IF Fourier spectrum. Useful to see how much noise there is in the data and where
+    Plot the IF Fourier spectrum. Useful to see how much noise there is in the data and where.
+    
     :param d: [m] distance bins TO DO: why is it here?
     :param ch: Dictionary containing the data
     :param sweep_number: sweep to plot
@@ -45,7 +46,8 @@ def plot_if_spectrum(d, ch, sweep_number, w, fir_gain, adc_bits, time_stamp, sho
 
 def plot_if_time_domain(fig_if, t, ch, sweep_number, s, ylim, time_stamp, show_plot=False):
     """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
-    Plot the IF data for a bunch of sweeps
+    Plot the IF data for a bunch of sweeps.
+    
     :param fig_if:
     :param t:
     :param ch:
@@ -82,7 +84,8 @@ def plot_if_time_domain(fig_if, t, ch, sweep_number, s, ylim, time_stamp, show_p
 
 def plot_angle(t, d, fxdb, angles_masked, clim, max_range, time_stamp, method='', show_plot=False):
     """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
-    Plot the angular data for a bunch of sweeps
+    Plot the angular data for a bunch of sweeps.
+    
     :param t:
     :param d:
     :param fxdb:
@@ -130,7 +133,8 @@ def plot_angle(t, d, fxdb, angles_masked, clim, max_range, time_stamp, method=''
 
 def plot_range_time(t, im, s, time_stamp=''):
     """TO DO: ACTUALIZE THE ARGUMENTS WITH THE NEW METHOD
-    Range time plot of a bunch of sweeps
+    Range time plot of a bunch of sweeps.
+    
     :param t:
     :param meshgrid_data:
     :param m:

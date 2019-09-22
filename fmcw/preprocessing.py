@@ -12,6 +12,7 @@ class fpga_reader(mp.Process):
         """
         Nothing too fancy here. Note that initially all the ftdi initialization was done here but the generated object
         cannot be pickled. Therefore, I moved it to the run function.
+        
         :param connection: the end of a Pipe
         :param s: settings dictionary
         """
@@ -29,6 +30,7 @@ class fpga_reader(mp.Process):
     def run(self):
         """
         Main routine polling the USB bus. It is not perfect, but >95% of the frames are valid with this configuration.
+        
         :return: void
         """
         self.adf4158 = adc.ADF4158()

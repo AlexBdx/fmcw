@@ -31,7 +31,8 @@ class FPGA():
 
     def close(self):
         """
-        Close the FTDI object
+        Close the FTDI object.
+        
         :return:
         """
         self.device.close()
@@ -40,6 +41,7 @@ class FPGA():
     def send_packet(self, x, cmd):
         """
         Add a header to a packet, encode it and write to FTDI.
+        
         :param x: data
         :param cmd: type of packet
         :return: write to FTDI
@@ -59,6 +61,7 @@ class FPGA():
     def clear_gpio(self, led=False, pa_off=False, mix_enbl=False, adf_ce=False):
         """
         Create a packet signaling the GPIO pins to clear on the FPGA.
+        
         :param led: Clear the LED
         :param pa_off: Clear pa_off
         :param mix_enbl: Disable mixer
@@ -79,6 +82,7 @@ class FPGA():
     def set_gpio(self, led=False, pa_off=False, mix_enbl=False, adf_ce=False):
         """
         Create a packet signaling the GPIO pins to set on the FPGA.
+        
         :param led: Set the LED
         :param pa_off: Set the pa_off
         :param mix_enbl: Enable the mixer
@@ -99,6 +103,7 @@ class FPGA():
     def clear_adc(self, oe1=False, oe2=False, shdn1=False, shdn2=False):
         """
         Create a packet signaling the ADC pins to clear on the FPGA.
+        
         :param oe1: Clear Output Enable 1
         :param oe2: Clear Output Enable 2
         :param shdn1: Clear Shutdown 1
@@ -119,6 +124,7 @@ class FPGA():
     def set_adc(self, oe1=False, oe2=False, shdn1=False, shdn2=False):
         """
         Create a packet signaling the ADC pins to set on the FPGA.
+        
         :param oe1: Set Output Enable 1
         :param oe2: Set Output Enable 2
         :param shdn1: Set Shutdown 1
@@ -139,6 +145,7 @@ class FPGA():
     def write_pll_reg(self, n):
         """
         Create a packet to configure a PLL register.
+        
         :param n: Configuration parameter
         :return: Packet to be encapsulated
         """
@@ -149,6 +156,7 @@ class FPGA():
     def write_pll(self):
         """
         Call for the configuration of all the registers.
+        
         :return: void
         """
         self.write_pll_reg(7)
@@ -166,6 +174,7 @@ class FPGA():
     def set_sweep(self, fstart, bw, length, delay):
         """
         Set sweep parameters.
+        
         :param fstart: [Hz] Start frequency of the chirp
         :param bw: [Hz] Bandwidth to use
         :param length: [s] Duration of the sweep
@@ -178,7 +187,8 @@ class FPGA():
 
     def write_sweep_timer(self, length):
         """
-        Convert the duration of the sweep to a number of ADC clock cycles
+        Convert the duration of the sweep to a number of ADC clock cycles.
+        
         :param length: number of clock cycles that represent the duration of a sweep
         :return: Packet to be encapsulated
         """
@@ -188,7 +198,8 @@ class FPGA():
 
     def write_sweep_delay(self, length):
         """
-        Convert the duration between two sweeps (sweep delay) to a number of ADC clock cycles
+        Convert the duration between two sweeps (sweep delay) to a number of ADC clock cycles.
+        
         :param length: number of clock cycles that represent the duration between two sweeps
         :return: Packet to be encapsulated
         """
@@ -198,7 +209,8 @@ class FPGA():
 
     def set_channels(self, a=True, b=True):
         """WARNING: ONLY 2 CHANNELS SUPPORTED
-        Set the channels to be activated (only two supported)
+        Set the channels to be activated (only two supported).
+        
         :param a: State of channel a
         :param b: State of channel b
         :return: Packet to be encapsulated
@@ -213,6 +225,7 @@ class FPGA():
     def set_downsampler(self, enable=True, quarter=False):
         """WARNING: THE FPGA CODE REQUIRES IT TO BE ENABLED. TO DO: ALLOW THE USER TO DEACTIVATE IT
         Set the downsampler.
+        
         :param enable: Turn it on
         :param quarter: Divide the sampling rate by another factor of 2
         :return: Packet to be encapsulated
@@ -227,6 +240,7 @@ class FPGA():
     def write_decimate(self, decimate):
         """
         Create a packet to configure the decimation factor at the FPGA level.
+        
         :param decimate: Number of sweeps to skip. 0 means no sweeps are skipped.
         :return: Packet to be encapsulated
         """
@@ -246,7 +260,8 @@ class FPGA():
 
     def write_pa_off_timer(self, length):
         """
-        Convert the duration pa_off_timer to a number of ADC clock cycles
+        Convert the duration pa_off_timer to a number of ADC clock cycles.
+        
         :param length: number of clock cycles that represent the pa_off_timer
         :return: Packet to be encapsulated
         """
@@ -256,7 +271,8 @@ class FPGA():
 
     def clear_buffer(self):
         """
-        Clear some buffer
+        Clear some buffer.
+        
         :return: Packet to be encapsulated
         """
         return self.send_packet(0, 11)
@@ -264,7 +280,8 @@ class FPGA():
 
 class Writer(Thread):
     """DEPRECATED
-    Legacy Writer thread used to write to the binary log file
+    Legacy Writer thread used to write to the binary log file.
+    
     """
     def __init__(self, filename, queue, encoding='latin1', timeout=0.5):
         Thread.__init__(self)
