@@ -33,6 +33,8 @@ If you plan on building one, make sure you have:
 
 Of course, these are rules of thumbs and should not be taken at face value.
 
+![FMCW3](Pictures/board.jpg)
+
 ### I have an fmcw3, what should I do next?
 Congratulations! There are two main options:
 1. You write your own script based on the library. This is expected to be hard as the documentation is lagging behind the code I write.
@@ -50,7 +52,7 @@ Four main tasks are being executed by the script:
 
 ### Architecture
 A picture is better than a thousand words so here is a schematic:
-![Architecture](https://i.ibb.co/Xt5Ffch/Architecture.png)
+![Architecture](Pictures/Architecture)
 
 ### Read the data from the FPGA
 This step is less easy than it sounds for a simple the reason: the FPGA is a real time chip while everything else (the usb port, the OS on my laptop, python...) is not. As a result, the FPGA outputs data are fixed intervals and if anything down the chain is not ready to receive it, the 4 kb buffers on the FTDI chip will quickly overflow and be overwritten. I have not found a silver bullet for that problem so far and only managed to mitigate it. 
@@ -76,12 +78,12 @@ The refresh rate is also severly limited on most laptop given the amount of work
 Below, a few examples of the displayed plots:
 ![IF signal](https://i.ibb.co/JyPQQCg/IF-signal.png)
 ![Angle plot](https://i.ibb.co/vm1McyL/Angle.png)
-![Range time plot](https://i.ibb.co/6ycCxZy/Range-time.png)
+![Range time plot](Pictures/rt.png)
 
 ## Technical considerations
 ### Batch processing
 Here is quick description of how a batch of data is processed.
-![Batch processing](https://i.ibb.co/18sv7S8/while-loop.png)
+![Batch processing](Pictures/while-loop.png)
 Feel like this is cryptic? It is. 
 In a nutshell, the point is to mitigate the non-real time nature of the script as much as possible. It is not perfect and some data will be lost, but these days less than 5% is lost.
 If you ever want to learn more just reach out to me.
