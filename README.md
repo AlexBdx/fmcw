@@ -3,6 +3,11 @@ Based on initial & ongoing work by Henrik Forstén/[@Ttl](https://github.com/Ttl
 
 Documentation in progress at [Read The Docs](https://fmcw.readthedocs.io)
 
+1. [Generalities](##Generalities)
+2. [Description of the flow](##Description of the flow)
+3. [Technical considerations](## Technical considerations)
+
+
 ## Generalities
 ### Version convention
 Releases have a version number in the following format:
@@ -52,7 +57,7 @@ Four main tasks are being executed by the script:
 
 ### Architecture
 A picture is better than a thousand words so here is a schematic:
-![Architecture](Pictures/Architecture)
+![Architecture](Pictures/Architecture.png)
 
 ### Read the data from the FPGA
 This step is less easy than it sounds for a simple the reason: the FPGA is a real time chip while everything else (the usb port, the OS on my laptop, python...) is not. As a result, the FPGA outputs data are fixed intervals and if anything down the chain is not ready to receive it, the 4 kb buffers on the FTDI chip will quickly overflow and be overwritten. I have not found a silver bullet for that problem so far and only managed to mitigate it. 
