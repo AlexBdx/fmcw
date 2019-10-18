@@ -4,8 +4,8 @@ Based on initial & ongoing work by Henrik Forstén/[@Ttl](https://github.com/Ttl
 **Documentation:** [Read The Docs](https://fmcw.readthedocs.io)
 
 1. [Generalities](#Generalities)
-2. [Description of the flow](#Description of the flow)
-3. [Technical considerations](#Technical considerations)
+2. [Description of the flow](#Description-of-the-flow)
+3. [Technical considerations](#Technical-considerations)
 
 
 ## Generalities

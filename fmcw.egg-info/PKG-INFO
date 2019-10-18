@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: fmcw
-Version: 3.2.4
+Version: 3.2.5
 Summary: Library for fmcw radar
 Home-page: https://github.com/AlexBdx/Heli/tree/master/fmcw
 Author: Alex Bondoux
@@ -12,8 +12,8 @@ Description: # FMCW
         **Documentation:** [Read The Docs](https://fmcw.readthedocs.io)
         
         1. [Generalities](#Generalities)
-        2. [Description of the flow](#Description of the flow)
-        3. [Technical considerations](#Technical considerations)
+        2. [Description of the flow](#Description-of-the-flow)
+        3. [Technical considerations](#Technical-considerations)
         
         
         ## Generalities
